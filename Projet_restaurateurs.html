@@ -55,7 +55,7 @@
 									<h1>Dashboard for restaurateurs</h1>
 								</header>
 								
-								<p>Imagine that you are a restaurateur and you own four restaurants in Paris. Over the past four years, you have been using a cash register system provided by a company - let's call it <i>Tracker-System</i>. This system allows servers to take orders and generate the bills. It also enables you to handle customer payments. Today, you are commissioning the <i>Tracker System</i> company to provide you with a report based on this data.</p>
+								<p>Imagine that you are a restaurateur and you own four restaurants in Paris. Over the past four years, you have been using a cash register system provided by a company - let's call it <i>Tracker-System</i>. This system allows servers to take orders and generate the bills. It also enables you to handle customer payments. Today, you are commissioning the <i>Tracker System</i> company to provide you with a dashboard to analyse this data.</p>
 								
 								<p>The objective is to centralize all the data in one place, allowing you to address several issues: </br>
 								- How to track the turnover of your various restaurants?</br>
@@ -67,20 +67,47 @@
 								<p>This project is the one we completed at the end of our Bootcamp at <b>Le Wagon</b>. The interactive dashboard from Power BI is presented directly below, and you can find all the technical details at the end of this article.</p>
 								
 								<div class="responsive-iframe-container">
-									<iframe title="Report Section" src="https://app.powerbi.com/view?r=eyJrIjoiNmZmMjJkOGItZDc2YS00MWMxLTkxMDgtYmZhNTJmZGJmYmM1IiwidCI6IjZmMzRkNDRlLWEyODEtNDIzMC04MDJhLWEzNzBkMWM5ZjQyYyJ9&pageName=ReportSection" frameborder="0" allowFullScreen="true"></iframe>
+									<iframe title="Dashboard restaurateurs" src="https://app.powerbi.com/view?r=eyJrIjoiNmZmMjJkOGItZDc2YS00MWMxLTkxMDgtYmZhNTJmZGJmYmM1IiwidCI6IjZmMzRkNDRlLWEyODEtNDIzMC04MDJhLWEzNzBkMWM5ZjQyYyJ9&pageName=ReportSection" frameborder="0" allowFullScreen="true"></iframe>
 								</div>
-
+									
 								</br>
 								<hr />
 								</br>
 
 								<h3>Contextualization</h3>
+
 								<p>The first page of the report is an overview of the monitoring results for all of your restaurants. The goal of this page is to provide you with the most important KPIs for daily tracking without going into the details of the analysis. This will be possible in the following pages of the report. The results are compared with the same day of the previous week. If you hosted an event at your <b>Au Chat lheureux</b> restaurant during lunch service yesterday, you can specifically examine these KPIs and see the impact of the event compared to the previous week.</p>
 								<span class="image fit"><img src="images\Dashboard pour restaurateurs_Screenshot 1.png" alt="" /></span>
-								<p><i>Your event allowed you to increase the number of customers by 62 compared to last week and to boost your revenue by 60% without reducing your profit margin.</br></i></p>
-							</section>
+								<p>Your event allowed you to increase the number of customers by 62 compared to last week and to boost your revenue by 80% without reducing your profit margin.</br></p>
+							
+								<p>Let's imagine that you now wish to conduct a more detailed analysis of your turnover. Indeed, the year 2020 was a particularly challenging year for the restaurant industry with Covid, lockdowns, and restaurant closures. You want to assess the impact of Covid on your turnover. To do this, it is possible to 'zoom out' to view your turnover over several years. Let's look at the results for the three years 2018, 2019, and 2020 for the restaurants <b>La Cuisine du Chef</b> and <b>Riz Kiki</b> (the other two restaurants were not yet open in 2018). It is observed that since 2019, the turnover of both restaurants has been on a downward trend, and the second and third quarters of 2020 were very challenging. The fourth quarter is not yet complete.</p>
+								<span class="image fit"><img src="images\Dashboard pour restaurateurs_Screenshot 2.png" alt="" /></span>
+							
+								<p>It is interesting to note that the profit margin of the restaurant <b>La Cuisine du Chef</b> has consistently deteriorated since 2018. While it was <b>32.8%</b> at the beginning of 2018, it is now only <b>24.8%</b>. Let's try to understand the reason for this decline in margin in the rest of the report.</p>
+							
+								<span class="image fit"><img src="images\Dashboard pour restaurateurs_Screenshot 3.png" alt="" /></span>
+							
+								<p>On the above image, we are comparing the attendance of the restaurant <b>La Cuisine du Chef</b> for the years 2018 and 2020. We can observe that in 2018, the restaurant averaged 177 customers per week. This number drops to 144 in 2020, representing a decrease in attendance of <b>-18%</b>. Additionally, the breakdown of turnover by service shows that in 2018, the evening service accounted for a larger share of the turnover compared to 2020, where the lunch service seems to have gained importance. Could this potentially explain the observed loss in margin for the restaurant? Let's explore the final page of the report, which will allow us to delve into the types of products sold.</p>
 
+								<span class="image fit"><img src="images\Dashboard pour restaurateurs_Screenshot 4.png" alt="" /></span>
+
+								<p>This page allows us to track the evolution of turnover based on the type of products sold. The graph in the bottom right illustrates how the restaurant's revenue is distributed over time. It is noticeable that at the beginning of 2018, the dominant category in this distribution was the <b>main dishes</b>, alongside sales of <b>starters</b> and <b>desserts</b>. Over time, the proportion of these three categories has decreased in favor of the <b>set menus</b> category. The table in the bottom left shows that the profit margin on main dishes is <b>27.4%</b>, while it is only <b>14.6%</b> on set menus. This provides an explanation for the observed margin decrease in the La Cuisine de Chef restaurant mentioned earlier. This same table allows us to delve into the details of subcategories to identify the best-selling dishes or menus, along with their associated profit margins.</p>
+							
+								<p>Here is the dashboard that <i>Tracker-System</i> has provided you to centralize all the data from your restaurants in one place! Now, it's up to you, based on your challenges, to find a clue and follow the story to analyze the causes and solutions.</p>
+
+							</br>
+							<hr />
+							</br>
+
+							<h3>Technical part</h3>
+							<p><a href="Projet-restaurateurs_technique.html">Click here</a> to explore the technical aspects of designing this dashboard, the software and techniques used, input data, challenges, etc.</p>
+
+							</section>
 					</div>
+
+					<header id="header">
+						<a href="projects.html" class="logo">Back to the projects</a>
+					</header>
 
 				<!-- Copyright -->
 					<div id="copyright">
