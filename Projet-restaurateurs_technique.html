@@ -44,13 +44,188 @@
 								<h3>Dashboard for restaurateurs | Technical part</h3>
 							</header>
 
-							<p>À venir...</p>
+							<p>This project is our final bootcamp project at <b>Le Wagon</b>, which we completed as a group of four. We obtained a dataset of three tables, with no particular instruction: it was up to us to explore the data, understand, identify a problem, decide how to present them, etc. The data came from a real company that provides cash register services.</p>
 							
+							<p>We chose to present the data in the form of a report using Looker Studio, and later on, I recreated the report in Power BI on my own.</p>
+						
+							<p>We started the project with the three following tables :</p>
+
+
+							<!-- Table -->
+
+								<div class="table-wrapper">
+									<table>
+										<thead>
+											<tr>
+												<th>Table</th>
+												<th>Variables</th>
+												<th>Lines</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td>store_data</td>
+												<td>5</td>
+												<td>21</td>
+											</tr>
+											<tr>
+												<td>order_data</td>
+												<td>12</td>
+												<td>1 281 148</td>
+											</tr>
+											<tr>
+												<td>order_line</td>
+												<td>20</td>
+												<td>3 924 748</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+						
+							<ul>
+								<li>The table <i>store_data</i> contains information about all the stores in the dataset. The dataset not only included restaurants but also grocery stores, flower shops, etc. We chose to focus on only four restaurants from the dataset, beacause it was easier for telling the story you read on the previous page.</li>
+								<li>The <i>order_data</i> table contains information related to each order, with a unique key, <i>order_id</i></li>
+								<li>The <i>order_line</i> table contains each product sold and is linked to the <i>order_data</i> table by the <em>order_id</em> variable.</li>
+							</ul>
+
+							<p>The tables were stored in <b>BigQuery</b> and we worked with <b>DBT</b> for data cleaning, versioning, and to collaborate simultaneously on the project. The biggest challenge of the project was data cleaning. Indeed, the dataset contained various types of businesses, like restaurants and stores, each with a different use of cash registers. Additionally, two fields in the <i>order_line</i> table (<em>dim_category</em> and <em>dim_name</em>) were not consistently filled from one store to another and were often manually filled. We had to standardize categories, as evidenced by the following SQL query used to create the table <i>order_line_clean</i>:</p>
+
+							<!-- Preformatted Code -->
+							<pre><code>
+WITH tmp1 AS (
+	SELECT *,
+									
+--- Suppression des lignes avec prix unitaire et remise nulle
+--- Suppression des lignes CARTE CLESS
+	CASE
+		WHEN (m_unit_price=0 AND m_discount_amount=0) THEN 1
+		WHEN dim_name='CARTE CLESS' THEN 1
+		ELSE 0
+	END AS a_supprimer,
+								  
+--- Uniformisation des données exprimées en poids
+	CASE
+		WHEN (m_quantity > 0 AND m_quantity < 2 AND m_quantity != 1) THEN 'KILO'
+		WHEN dim_unit_measure = 'KILOGRAM|GRAM'THEN 'KILO'
+		ELSE 'UNITE'
+	END AS unit_measure,
+	FROM {{ ref('order_line') }}
+),
+								  
+								  
+--- Creation d'un table temporaire sans les lignes qui remplissent les conditions à supprimer
+tmp2 AS (
+SELECT
+	id_order_line,
+	id_order,
+	FORMAT_TIMESTAMP('%Y-%m-%d', date_opended) AS date_opened,
+	m_quantity,
+	m_unit_price,
+	m_unit_price_exc_vat,
+	m_total_price_inc_vat,
+	m_total_price_exc_vat,
+	m_tax_percent,
+	m_discount_amount,
+	dim_type,
+	dim_category,
+	dim_name,
+	unit_measure,
+FROM tmp1
+WHERE a_supprimer = 0
+)
+								  
+								  
+SELECT 
+	id_order_line,
+	id_order,
+	date_opened,
+	m_quantity AS qty,
+	m_unit_price  AS unit_price,
+	m_unit_price_exc_vat  AS unit_price_HT,
+	m_total_price_inc_vat AS total_price_TTC,
+	m_total_price_exc_vat AS total_price_HT,
+	m_tax_percent AS TVA_percent,
+	m_discount_amount AS discount_amount,
+	dim_type,
+									
+	--- Création de la category_clean  
+	CASE
+								  
+	--- Cas particuliers
+		WHEN REGEXP_CONTAINS(LOWER(dim_name), 'quiche + salade|formule entrée +|menu entrée +|formule plat +') IS TRUE THEN 'menu'
+		WHEN LOWER(dim_name) = 'plat du jour' THEN 'plat'
+		WHEN LOWER(dim_name) = 'plat unique' THEN 'plat'
+		WHEN LOWER(dim_name) ='plat chaud + dessert' THEN 'menu'
+		WHEN LOWER(dim_name) ='plat du jour + dessert' THEN 'menu'
+		WHEN LOWER(dim_name) ='spokbowl + dessert' THEN 'menu'
+		WHEN LOWER(dim_name) ='assiette degustation' THEN 'à grignoter'
+		WHEN REGEXP_CONTAINS(LOWER(dim_name), 'formule entrée + plat') IS TRUE THEN 'menu'
+		WHEN REGEXP_CONTAINS(LOWER(dim_name), 'lagrange|menetou salon|pic saint loup|savoie |creisses|plaisir de siaurac|morgon|quincy|mousse a zigu|petit jo|pouilly|chenin |mayne|barouillet|vacqueyras|pic st loup|moulins dascq|crozes|cheverny|siaurac|siauriac|graves|remejeanne|conso 4|conso 6|conso 7') IS TRUE THEN 'boisson avec alcool'
+		WHEN REGEXP_CONTAINS(LOWER(dim_name), 'g. iv|g.iv|gourmandise g|gourmand g') IS TRUE THEN 'évènement'
+		WHEN REGEXP_CONTAINS(LOWER(dim_name), 'pasta a emporter') IS TRUE THEN 'plat'
+		WHEN REGEXP_CONTAINS(LOWER(dim_name), 'pizzetta') IS TRUE THEN 'à grignoter'
+		WHEN REGEXP_CONTAINS(LOWER(dim_name), 'chocolat chaud') IS TRUE THEN 'boisson sans alcool'
+								  
+						  
+	--- Cas généraux
+		WHEN REGEXP_CONTAINS(LOWER(dim_category), 'entree|entrée|entées') IS TRUE THEN 'entree'
+		WHEN REGEXP_CONTAINS(LOWER(dim_category), 'plat|pizza|biriyani|biryani|mix grill|poisson|bowl|soupe|potage|pate|pâtes|pasta') IS TRUE THEN 'plat'
+		WHEN REGEXP_CONTAINS(LOWER(dim_category), 'dessert|patisserie|glace|chocolat|panna cotta|ice|sweet|sucre|sucré|confiserie') IS TRUE THEN 'dessert'
+		WHEN REGEXP_CONTAINS(LOWER(dim_category), 'fromage|frawmages') IS TRUE THEN 'fromage'
+		WHEN REGEXP_CONTAINS(LOWER(dim_category), 'soft|the|thé|café|cafe|sirop|eau|eaux|soda|jus|evian|pellegrino|charitea|tasse|methodes douces|espression|expression|espresso|perrier|expresso|infusion|citronnade|golden milk|caffe|smoothie|tourtel|milkshake|lurisia|dirty chai') IS TRUE THEN 'boisson sans alcool'     
+		WHEN REGEXP_CONTAINS(LOWER(dim_category), 'vin|biere|bière|pression|alcool|champagne|cocktail|digestif|rose|rosé|cidre|apero|apéro|apéritif|aperitivo|aperitif|blanc|rouge|drink|petillant|whisky|pinot|alsace|rhone|rhône|saumur|lassi|martini|provence|castel|merlot|clos|gamay|muscadet|valle|i.g.p|bourgueil|happy hour|anjou|kir|crus|degustion|dégustation|brouilly|toscane|tavel|sicile|breizh|beer|spritz|merlot|syrah|sauvignon|limoncello|bergeron|stella artois') IS TRUE THEN 'boisson avec alcool'
+		WHEN REGEXP_CONTAINS(LOWER(dim_category), 'menu|formule|coursemeal|brunch') IS TRUE THEN 'menu'
+		WHEN REGEXP_CONTAINS(LOWER(dim_category), 'consigne') IS TRUE THEN 'consigne'
+		WHEN REGEXP_CONTAINS(LOWER(dim_category), 'salade') IS TRUE THEN 'plat'
+		WHEN REGEXP_CONTAINS(LOWER(dim_category), 'sandwich') IS TRUE THEN 'plat'
+		WHEN REGEXP_CONTAINS(LOWER(dim_category), 'antipasti|planche|tapas|grignotage|pour commencer|wrap|toast|envies sal|charcuterie|est tricher|sfizio') IS TRUE THEN 'à grignoter'
+		WHEN REGEXP_CONTAINS(LOWER(dim_category), 'sélection|selection') IS TRUE THEN 'café en grain'
+		WHEN REGEXP_CONTAINS(LOWER(dim_category), 'riz|accompagnement|légume|sides|pain') IS TRUE THEN 'accompagnement'
+		WHEN REGEXP_CONTAINS(LOWER(dim_category), 'supplement|supplément|les petits +') IS TRUE THEN 'supplément'
+		WHEN REGEXP_CONTAINS(LOWER(dim_category), 'pourboire') IS TRUE THEN 'pourboire'
+		WHEN REGEXP_CONTAINS(LOWER(dim_category), 'chicha') IS TRUE THEN 'chicha'
+		WHEN REGEXP_CONTAINS(LOWER(dim_category), 'privatisation') IS TRUE THEN 'évènement'
+							  
+		WHEN REGEXP_CONTAINS(LOWER(dim_name), 'entree|entrée|entées') IS TRUE THEN 'entree'
+		WHEN REGEXP_CONTAINS(LOWER(dim_name), 'plat|pizza|biriyani|biryani|mix grill|poisson|bowl|soupe|potage|pate|pâtes|pasta|tartare|escalope|burger|saumon|entrcôte|andouillette|st jacques|bar de ligne') IS TRUE THEN 'plat'
+		WHEN REGEXP_CONTAINS(LOWER(dim_name), 'dessert|patisserie|glace|chocolat|panna cotta|ice|sweet|sucre|sucré|confiserie') IS TRUE THEN 'dessert'
+		WHEN REGEXP_CONTAINS(LOWER(dim_name), 'fromage|frawmages') IS TRUE THEN 'fromage'
+		WHEN REGEXP_CONTAINS(LOWER(dim_name), 'menu|formule|coursemeal|brunch|petit d|repas') IS TRUE THEN 'menu'
+		WHEN REGEXP_CONTAINS(LOWER(dim_name), 'consigne') IS TRUE THEN 'consigne'
+		WHEN REGEXP_CONTAINS(LOWER(dim_name), 'salade') IS TRUE THEN 'plat'
+		WHEN REGEXP_CONTAINS(LOWER(dim_name), 'sandwich') IS TRUE THEN 'plat'
+		WHEN REGEXP_CONTAINS(LOWER(dim_name), 'antipasti|planche|tapas|grignotage|pour commencer|wrap|toast|envies sal|charcuterie|assiette afterwork') IS TRUE THEN 'à grignoter'
+		WHEN REGEXP_CONTAINS(LOWER(dim_name), 'sélection|selection') IS TRUE THEN 'café en grain'
+		WHEN REGEXP_CONTAINS(LOWER(dim_name), 'riz|accompagnement|légume|sides|pain') IS TRUE THEN 'accompagnement'
+		WHEN REGEXP_CONTAINS(LOWER(dim_name), 'supplement|supplément|les petits +') IS TRUE THEN 'supplément'
+		WHEN REGEXP_CONTAINS(LOWER(dim_name), 'pourboire') IS TRUE THEN 'pourboire'
+		WHEN REGEXP_CONTAINS(LOWER(dim_name), 'chicha') IS TRUE THEN 'chicha'
+		WHEN REGEXP_CONTAINS(LOWER(dim_name), 'avec alcool|vin|biere|bière|pression|blonde|alcool|champagne|cocktail|digestif|rose|rosé|cidre|apero|apéro|apéritif|aperitivo|aperitif|blanc|rouge|drink|petillant|whisky|pinot|alsace|rhone|rhône|saumur|lassi|martini|provence|castel|merlot|clos|gamay|muscadet|valle|i.g.p|bourgueil|happy hour|anjou|kir|crus|degustion|dégustation|brouilly|toscane|tavel|sicile|breizh|beer|spritz|sauvignon|kingfisher|syrah|stella|bergeron|limoncello|roussanne|heineken|chardonnay|amaretto|grappa|shooter') IS TRUE THEN 'boisson avec alcool'
+		WHEN REGEXP_CONTAINS(LOWER(dim_name), 'soft|the|thé|café|cafe|sirop|eau|eaux|soda|jus|evian|pellegrino|charitea|tasse|methodes douces|sans alcool|espression|expression|chai latte|coca|cola|espresso|expresso|lemonaid|perrier|infusion|lurisia|golden milk|citronnade|milkshake|tourtel|caffe|gazeifiee|mangajo|nimbupani|cappuccino|smoothie') IS TRUE THEN 'boisson sans alcool'    
+		WHEN REGEXP_CONTAINS(LOWER(dim_name), 'retour produit') IS TRUE THEN 'retour produit'
+		WHEN REGEXP_CONTAINS(LOWER(dim_name), 'discount') IS TRUE THEN 'discount'
+		WHEN REGEXP_CONTAINS(LOWER(dim_name), 'privatisation|forfait|initiation|formation|prestation') IS TRUE THEN 'évènement'
+							  
+		WHEN dim_category = 'ADD' THEN 'plat'
+		WHEN dim_category = 'BOF' THEN 'fromage'
+								  
+		ELSE 'divers'
+	END AS category_clean,
+								  
+	dim_name AS category2,
+	unit_measure,
+								  
+FROM tmp2</code></pre>
+
+							<p></br>Finally, after cleaning and enriching our data using the following model, we created our two views, <i>order_data_final_view</i> and <i>order_line_final_view</i>, which were used for the visualization part of the project.</p>
+
+							<span class="image fit"><img src="images\Schéma.png" alt="" /></span>
+
 						</section>
 					</div>
 
 					<header id="header">
-						<a href="projects.html" class="logo">Back to the project</a>
+						<a href="Projet_restaurateurs.html" class="logo">Back to the project</a>
 					</header>
 
 				<!-- Copyright -->
