@@ -1,0 +1,112 @@
+<!DOCTYPE HTML>
+<!--
+	Massively by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+
+		<!-- Google tag (gtag.js) -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=G-M4ELZP38HE"></script>
+		<script>
+  			window.dataLayer = window.dataLayer || [];
+  			function gtag(){dataLayer.push(arguments);}
+  			gtag('js', new Date());
+  			gtag('config', 'G-M4ELZP38HE');
+		</script>
+
+
+		<title>Training log from Strava</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+		<div id="wrapper" class="fade-in">
+
+				<!-- Header -->
+				<header id="header">
+				</header>
+
+				<!-- Nav -->
+					<nav id="nav">
+						<ul class="links">
+							<li><a href="index.html">About Me</a></li>
+							<li><a href="projects.html">My Projects</a></li>
+							<li><a href="contact.html">Contact</a></li>
+						</ul>
+						<ul class="icons">
+							<li><a href="https://www.linkedin.com/in/thibault-baroche/" class="icon brands fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+							<li><a href="https://github.com/Thibault-Baroche" class="icon brands fa-github" target="_blank"><span class="label">GitHub</span></a></li>
+						</ul>
+					</nav>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- Post -->
+							<section class="post">
+								<header class="major">
+									<span class="date">February 01, 2024</span>
+									<h1>Personal training log from Strava</h1>
+								</header>
+								
+								<p>This project is a dashboard that I created for my personal use. As an outdoor sports enthusiast and endurance athlete, I have been regularly using Strava (a kind of social network for training) since 2013. Today, I have almost 2000 recorded activities on the platform, which beyond the social aspect, serves as a goldmine of information for my training geek side. While Strava does offer analysis functions, they are rather basic and lack of flexibility regarding dates. I wanted to take it a step further.</p>
+								
+								<p>Indeed, I wanted to be able to answer questions like: </br>
+								- In three months, I will be running the same ultra trail that I completed in 2015. At that time of the year, how much distance had I covered while running? Do I have more or less training volume this year?</br>
+								- How much elevation gain did I cover in ski mountaineering last winter (from November to April, spanning two calendar years)?</br>
+								- Compared to last year at the same time, do I have more or less paragliding flight hours?</br>
+								- What is my Top 5 of longer / harder / with more elevation gain trainings by activity ?</br>
+
+								<p>Furthermore, when I finish an activity, my GPS watch automatically syncs with Strava via Bluetooth or Wifi. I wanted my report to update in the same manner, without requiring any additional action on my part.</p>
+								
+								<p>To achieve this, I used Zapier, which automatically retrieves my training data via the Strava API. These data are stored and processed in Google Sheets, and I used Looker for the visualization part. The report is directly available below, and I delve into the technical details at the bottom of this page.</p>
+
+								<div class="responsive-iframe-container-portrait">
+									<iframe src="https://lookerstudio.google.com/embed/reporting/a02466b4-ce62-44b5-b180-63bc18a4a66a/page/inETD" frameborder="0" style="border:0" allowfullscreen sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
+								</div>
+									
+								</br>
+								<hr />
+								</br>
+
+								<h3>Contextualization</h3>
+
+								
+							</br>
+							<hr />
+							</br>
+
+							<h3>Technical part</h3>
+							<p><a href="">Click here</a> to explore the technical aspects of designing this dashboard, including the automation and the different software and techniques used.</p>
+
+							</section>
+					</div>
+
+					<header id="header">
+						<a href="projects.html" class="logo">Back to the projects</a>
+					</header>
+
+				<!-- Copyright -->
+					<div id="copyright">
+						<ul><li>&copy; Thibault Baroche</li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li></ul>
+					</div>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
