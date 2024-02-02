@@ -1,0 +1,92 @@
+<!DOCTYPE HTML>
+<!--
+	Massively by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Training log from Strava - Technical part</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper" class="fade-in">
+
+				<!-- Header -->
+					<header id="header">
+						<a href="Projet_strava.html" class="logo">Back to the project</a>
+					</header>
+
+				<!-- Nav -->
+				<nav id="nav">
+					<ul class="links">
+						<li><a href="index.html">About Me</a></li>
+						<li><a href="projects.html">My Projects</a></li>
+						<li><a href="contact.html">Contact</a></li>
+					</ul>
+					<ul class="icons">
+						<li><a href="https://www.linkedin.com/in/thibault-baroche/" class="icon brands fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+						<li><a href="https://github.com/Thibault-Baroche" class="icon brands fa-github" target="_blank"><span class="label">GitHub</span></a></li>
+					</ul>
+				</nav>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- Post -->
+						<section class="post">
+							<header class="major">
+								<h3>Automatic training log from Strava | Technical part</h3>
+							</header>
+
+							<p>The achievement of this project had two specific objectives. The first one, as explained on the previous page, was to develop a dashboard that would allow me to delve into my training statistics in a precise manner. The second objective was the implementation of a fully automated process, to familiarize myself with the <b>Zapier</b> tool and focus on the upstream part of the data analysis process: data collection.</p>
+				
+							<p>Strava is seamlessly integrated into Zapier, greatly simplifying the process. To begin, I created a new Zap following this scheme:</p>
+
+							<span class="image fit"><img src="images\Zapier_Schéma.png" alt="" /></span>
+
+							<p>As soon as an activity is added to my Strava account, the trigger is activated, and it adds a new line in an associated Google Sheet file. It retrieves the following fields via the Strava API:</p>
+
+							<span class="image fit"><img src="images\Import Zapier.png" alt="" /></span>
+
+							<p>To avoid interfering with the import process that overwrites all formulas with each new added line, the rest of the data cleaning and preparation will be done in another Google Sheet file. In this file, I exported my activity history since 2013 and added it to the first tab. In a second tab, I retrieve all the data from Zapier using the <i>IMPORTRANGE</i> function. This way, I get the raw data as it comes out of the API:</p>
+
+							<span class="image fit"><img src="images\Import Zapier données brutes.png" alt="" /></span>
+
+							<p>Then, simply create a new tab that combines all the old activities downloaded before automation via Zapier and the newly imported data, format them in the correct formats and units:</p>
+							
+							<span class="image fit"><img src="images\Import Zapier données clean.png" alt="" /></span>
+
+							<p>From now on, it's just a matter of linking this data sheet with <b>Looker Studio</b> and moving on to the dashboard creation part!</p>
+
+							<p>This small project, without major technical challenges, was a good way to create a first automated dashboard, addressing a personal need and making it easier for me to visualize my training statistics.</p>
+						</section>
+					</div>
+
+					<header id="header">
+						<a href="Projet_strava.html" class="logo">Back to the project</a>
+					</header>
+
+				<!-- Copyright -->
+					<div id="copyright">
+						<ul><li>&copy; Thibault Baroche</li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li></ul>
+					</div>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
