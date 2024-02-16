@@ -10,6 +10,7 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
+		<link rel="stylesheet" href="assets/css/googlecode.min.css" />
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
 	</head>
 	<body class="is-preload">
@@ -91,7 +92,7 @@
 							<p>The tables were stored in <b>BigQuery</b> and we worked with <b>DBT</b> for data cleaning, versioning, and to collaborate simultaneously on the project. The biggest challenge of the project was data cleaning. Indeed, the dataset contained various types of businesses, like restaurants and stores, each with a different use of cash registers. Additionally, two fields in the <i>order_line</i> table (<em>dim_category</em> and <em>dim_name</em>) were not consistently filled from one store to another and were often manually filled. We had to standardize categories, as evidenced by the following SQL query used to create the table <i>order_line_clean</i>:</p>
 
 							<!-- Preformatted Code -->
-							<pre><code>
+							<pre><code class="sql">
 WITH tmp1 AS (
 	SELECT *,
 									
@@ -243,6 +244,8 @@ FROM tmp2</code></pre>
 			<script src="assets/js/breakpoints.min.js"></script>
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
+			<script src="assets/js/highlight.min.js"></script>
+			<script>hljs.initHighlightingOnLoad();</script>
 
 	</body>
 </html>

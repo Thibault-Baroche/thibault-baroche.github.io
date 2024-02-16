@@ -1,0 +1,663 @@
+<!DOCTYPE HTML>
+<!--
+	Massively by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Avalanches Project - Technical part</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<link rel="stylesheet" href="assets/css/googlecode.min.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper" class="fade-in">
+
+				<!-- Header -->
+					<header id="header">
+						<a href="Projet_avalanches.html" class="logo">Back to the project</a>
+					</header>
+
+				<!-- Nav -->
+				<nav id="nav">
+					<ul class="links">
+						<li><a href="index.html">About Me</a></li>
+						<li><a href="projects.html">My Projects</a></li>
+						<li><a href="contact.html">Contact</a></li>
+					</ul>
+					<ul class="icons">
+						<li><a href="https://www.linkedin.com/in/thibault-baroche/" class="icon brands fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+						<li><a href="https://github.com/Thibault-Baroche" class="icon brands fa-github" target="_blank"><span class="label">GitHub</span></a></li>
+					</ul>
+				</nav>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- Post -->
+						<section class="post">
+							<header class="major">
+								<h3>STUDY OF AVALANCHES IN THE ALPS | Technical part</h3>
+							</header>			
+	
+							<p>For this project, the avalanche data was graciously provided by <a href="https://www.data-avalanche.org/" target="_blank">data-avalanche.org</a> in the form of an Excel file listing 3619 avalanches worldwide, with the oldest one from… 1935! I decided to focus on the avalanches in the French Alps since 2010 to reduce the number of avalanches (2808) and have a bit more consistency in the data.</br></p>
+							<h3>Data Cleaning</h3>
+							<p>The first part of the project involved cleaning the data in BigQuery. The two main challenges during the cleaning were as follows: on one hand, I knew that I would use the Skitour massif classification and therefore had to match the massifs. So there was a lot of work to assign a massif name to manually entered data that was not well ordered. The second challenge was managing the times, which were also manually entered with all the variety of formatting one can imagine!</p>
+							<p>Here is the SQL query below, which allowed me to output the table for the data visualization part in Power BI:</p>
+
+<pre><code class="sql">WITH tmp AS(
+  SELECT
+	Id
+	,Massif
+									  
+	/* Remplissage de la colonne Massif_clean */
+	,CASE
+	  /* Massifs des Alpes */
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'alpes grées n|rosière|sainte foy') IS TRUE THEN 'Alpes Grées N'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'alpes grées s') IS TRUE THEN 'Alpes Grées S'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'bauges') IS TRUE THEN 'Bauges'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'beaufortain|mont joly|mont joli') IS TRUE THEN 'Beaufortain'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'belledonne|sept laux') IS TRUE THEN 'Belledonne'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'bornes|aravis|bargy|jallouvre') IS TRUE THEN 'Bornes - Aravis'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'cerces|thabor|cenis|clarée|galibier|chaberton') IS TRUE THEN 'Cerces - Thabor - Mont Cenis'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'chablais|faucigny') IS TRUE THEN 'Chablais - Faucigny'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'chartreuse') IS TRUE THEN 'Chartreuse'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'devoluy|dévoluy') IS TRUE THEN 'Devoluy'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'ecrin|écrin|champsaur|pelvoux|valbonnais|grave') IS TRUE THEN 'Écrins'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'arves|grandes rousses|arvan|corbier') IS TRUE THEN 'Grandes Rousses - Arves'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'giffre|aiguilles rouges|fiz') IS TRUE THEN 'Haut Giffre - Aiguilles Rouges'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'lauzière') IS TRUE THEN 'Lauzière - Cheval Noir'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'mercantour') IS TRUE THEN 'Mercantour - Alpes Maritimes Italiennes'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'mont blanc|mont-blanc') IS TRUE THEN 'Mont-Blanc'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'digne|monges') IS TRUE THEN 'Préalpes de Digne'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'préalpes de grasse') IS TRUE THEN 'Préalpes de Grasse'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'préalpes de provence|ventoux') IS TRUE THEN 'Préalpes de Provence'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'queyras|cervieres|ceillac') IS TRUE THEN 'Queyras - Alpes Cozie N'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'taillefer|matheysine') IS TRUE THEN 'Taillefer - Matheysine'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'ubaye|parpaillon|guillestrois|embrunais') IS TRUE THEN 'Ubaye - Parpaillon - Alpes Cozie S'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'vanoise|thorens') IS TRUE THEN 'Vanoise'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'vercors') IS TRUE THEN 'Vercors'
+								  
+	  /* Massifs hors des Alpes */
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'bearn|cévennes|chilenas|corse|kirghizie|val|senal|abruzzes|chili|montes martial|bagnes|bigorre|massif central|aoste|pyrénées|pyrenées|courmayeur|mont rose|cantal|puigmal|cervino|monte rosa|vosges|val formazza|mereshuvka|ruitor') IS TRUE THEN 'Autres'
+										  
+	  /* Exeptions Maurienne & Tarentaise */
+	  WHEN LOWER(Massif)="haute maurienne" THEN 'Haute Maurienne'
+	  WHEN LOWER(Massif)="haute tarentaise" THEN 'Haute Tarentaise'
+	  WHEN LOWER(Massif)="maurienne" THEN 'Maurienne'
+	  WHEN LOWER(Massif)="tarentaise" THEN 'Vanoise'
+										  
+	  /* Tri Oisans */
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'oisans') IS TRUE AND REGEXP_CONTAINS(Sommet_secteur, 'Aiguillette du Lauzet') IS TRUE THEN 'Cerces - Thabor - Mont Cenis'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'oisans') IS TRUE AND REGEXP_CONTAINS(Sommet_secteur, "Aig du Plat de la Selle|Aiguillon|Col du Lautaret|La Meije|La Grave|Pelvoux|Ecrin|Écrin|Combeynot|Serre Chevalier|Saint Christophe en Oisans|Bec de l’homme|Grande Ruine|Lac du Chambon|Le Rochail|Les 2 Alpes|Mont de Lans|Muzelle|Ailefroide|Olan|Petit Pinier|Pic de l'Homme|Yret|Pic du Col d'Ornon|Pied du Col|villard d arene|Valjouffrey|Tête du Cheret|Tête des Filons|Tête de la Toura|Tête de la Marsare|Tête de Vautisse|Lauranoure") IS TRUE THEN 'Écrins'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'oisans') IS TRUE AND REGEXP_CONTAINS(Sommet_secteur, 'Auris en Oisans|Col du Sabot|Crête de Chaillol|Crête de la Buffe|La Croix de Cassini|Grande Sure|la sure||Montagne de Rachas|Pic des trois évêchés|dome des rousses') IS TRUE THEN 'Grandes Rousses - Arves'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'oisans') IS TRUE AND REGEXP_CONTAINS(Sommet_secteur, 'Côte Rouge|La Pyramide|Lavaldens') IS TRUE THEN 'Taillefer - Matheysine'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'oisans') IS TRUE AND REGEXP_CONTAINS(Sommet_secteur, 'Pic de la pierre') IS TRUE THEN 'Belledonne'
+										  
+	  /* Tri Alpes du Sud */
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'alpes du sud') IS TRUE AND REGEXP_CONTAINS(Sommet_secteur, 'Séolane') IS TRUE THEN 'Préalpes de Digne'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'alpes du sud') IS TRUE AND REGEXP_CONTAINS(Sommet_secteur, 'Vars|Plateau de Bouchiers|ubaye|Crévoux|Arpillon|Crachet') IS TRUE THEN 'Ubaye - Parpaillon - Alpes Cozie S'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'alpes du sud') IS TRUE AND REGEXP_CONTAINS(Sommet_secteur, 'cime de la combe crose|refuge de la Blanche|Montgenèvre|Cervières|Abriès') IS TRUE THEN 'Queyras - Alpes Cozie N'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'alpes du sud') IS TRUE AND REGEXP_CONTAINS(Sommet_secteur, 'vallon de coste pélaou') IS TRUE THEN 'Mercantour - Alpes Maritimes Italiennes'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'alpes du sud') IS TRUE AND REGEXP_CONTAINS(Sommet_secteur, 'ecrins|Grande Autane|Col de la Coupa') IS TRUE THEN 'Écrins'
+										  
+	  /* Tri Briançonnais */
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'briançonnais') IS TRUE AND REGEXP_CONTAINS(Sommet_secteur, 'Aiguillette du Lauzet|Chaberton|Nevache|Val Des Prés|cristol|mandette') IS TRUE THEN 'Cerces - Thabor - Mont Cenis'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'briançonnais') IS TRUE AND REGEXP_CONTAINS(Sommet_secteur, "Cime de la Condamine|Lautaret|Rocher de l’yret|Serre Chevalier|Sommet du Prorel|Dormillouse") IS TRUE THEN 'Écrins'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'briançonnais') IS TRUE AND REGEXP_CONTAINS(Sommet_secteur, "Clot la Cime|Col de Chaude Maison|Grand Charvia|Izoard|L'Arpelin|Janus|Montgenèvre") IS TRUE THEN 'Queyras - Alpes Cozie N'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'briançonnais') IS TRUE AND REGEXP_CONTAINS(Sommet_secteur, "galibier") IS TRUE THEN 'Grandes Rousses - Arves'
+										  
+	  /* Tri Alpes */
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'alpes') IS TRUE AND REGEXP_CONTAINS(Sommet_secteur, 'Albaron') IS TRUE THEN 'Alpes Grées S'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'alpes') IS TRUE AND REGEXP_CONTAINS(Sommet_secteur, 'Cervières|Ceillac|Montgenèvre') IS TRUE THEN 'Queyras - Alpes Cozie N'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'alpes') IS TRUE AND REGEXP_CONTAINS(Sommet_secteur, 'Vaujany|galibier') IS TRUE THEN 'Grandes Rousses - Arves'
+	  WHEN REGEXP_CONTAINS(LOWER(Massif), 'alpes') IS TRUE AND REGEXP_CONTAINS(Sommet_secteur, 'Jovet') IS TRUE THEN 'Vanoise'
+										  
+      /* Cas Null */
+	  WHEN Massif IS NULL THEN 'Autres'
+										  
+	  /* Cas particuliers */					  
+	  WHEN Id=1583789765781 THEN 'Écrins'
+	  WHEN Id=1608140928554 THEN 'Écrins'
+	  WHEN Id=1611859192276 THEN 'Alpes Grées N'
+	  WHEN Sommet_secteur="Pic Quest" THEN 'Autres'
+										  
+	  ELSE 'Autres'
+	END AS Massif_clean
+								
+	,Sommet_secteur AS Secteur
+	,Orientation
+	,Date
+										
+	/* Nettoyage de l'heure */
+	,Heure
+										
+	,CASE
+	  WHEN(Heure = '11hoo') THEN TIME(11, 00, 00)
+	  WHEN(Heure = '14hoo') THEN TIME(14, 00, 00)
+	  WHEN(Heure = '18h ?') THEN TIME(18, 00, 00)
+	  WHEN LOWER(Heure) = 'nuit' THEN Null
+	  WHEN LOWER(Heure) LIKE '__:__' THEN TIME(CAST(SUBSTR(HEURE,1,2) AS INT64), CAST(SUBSTR(HEURE,4,2) AS INT64), 00)
+	  WHEN LOWER(Heure) LIKE '_:__' THEN TIME(CAST(SUBSTR(HEURE,1,1) AS INT64), CAST(SUBSTR(HEURE,3,2) AS INT64), 00)
+	  WHEN LOWER(Heure) LIKE '__:_' THEN TIME(CAST(SUBSTR(HEURE,1,2) AS INT64), 00, 00)
+	  WHEN LOWER(Heure) LIKE '__h__' THEN TIME(CAST(SUBSTR(HEURE,1,2) AS INT64), CAST(SUBSTR(HEURE,4,2) AS INT64), 00)
+	  WHEN LOWER(Heure) LIKE '__ h' THEN TIME(CAST(SUBSTR(HEURE,1,2) AS INT64), 00, 00)
+	  WHEN LOWER(Heure) LIKE '_h__' THEN TIME(CAST(SUBSTR(HEURE,1,1) AS INT64), CAST(SUBSTR(HEURE,3,2) AS INT64), 00)
+	  WHEN LOWER(Heure) LIKE '__.__' THEN TIME(CAST(SUBSTR(HEURE,1,2) AS INT64), CAST(SUBSTR(HEURE,4,2) AS INT64), 00)
+	  WHEN LOWER(Heure) LIKE '_.__' THEN TIME(CAST(SUBSTR(HEURE,1,1) AS INT64), CAST(SUBSTR(HEURE,3,2) AS INT64), 00)
+	  WHEN LOWER(Heure) LIKE '__h' THEN TIME(CAST(SUBSTR(HEURE,1,2) AS INT64), 00, 00)
+	  WHEN LOWER(Heure) LIKE '_h' THEN TIME(CAST(SUBSTR(HEURE,1,1) AS INT64), 00, 00)
+	  WHEN LOWER(Heure) LIKE '_h' THEN TIME(CAST(SUBSTR(HEURE,1,1) AS INT64), 00, 00)
+	  WHEN LOWER(Heure) LIKE '??' THEN TIME(0,0,0)
+	  WHEN LOWER(Heure) LIKE '__' THEN TIME(CAST(SUBSTR(HEURE,1,2) AS INT64), 00, 00)
+	  WHEN LOWER(Heure) LIKE '____' THEN TIME(CAST(SUBSTR(HEURE,1,2) AS INT64), CAST(SUBSTR(HEURE,3,2) AS INT64), 00)
+	  WHEN LOWER(Heure) LIKE '__:__:__' THEN TIME(CAST(SUBSTR(HEURE,1,2) AS INT64), CAST(SUBSTR(HEURE,4,2) AS INT64), 00)
+	  WHEN LOWER(Heure) LIKE '__h __' THEN TIME(CAST(SUBSTR(HEURE,1,2) AS INT64), CAST(SUBSTR(HEURE,5,2) AS INT64), 00)
+	  WHEN LOWER(Heure) LIKE '__h__%' THEN TIME(CAST(SUBSTR(HEURE,1,2) AS INT64), 00, 00)   
+	  WHEN REGEXP_CONTAINS(LOWER(Heure), 'inconnu') IS TRUE THEN Null
+										
+	  ELSE Null
+	END AS heure_clean
+										
+	,Caract__ristique AS Caracteristique
+	,Origine_principale AS Origine
+	,Alti_d__part AS Altitude_depart
+	,Risque_MF AS Risque
+	,Description
+										
+	FROM `premium-highway-386107.Data_avalanches.stg_avalanches`
+	WHERE Pays="France" OR Pays IS NULL
+)
+										
+SELECT
+  Id AS Id_avalanche
+  ,Massif_clean AS Massif
+  ,Secteur
+  ,Orientation
+  ,Date
+  ,heure_clean AS Heure
+  ,Caracteristique
+  ,Origine
+  ,Altitude_depart
+  ,Risque
+  ,Description
+FROM tmp</code></pre>
+
+							</br>
+							<h3>Statistical Analysis</h3>
+							<p>The statistical analysis was then carried out using Python in Google Colab. Here is the detailed code I used. First, I imported my data as a dataframe and worked on the data to be able to use it later. For example, I modified typographies in the names of massifs, separated the dates into months and years which were the only interesting data, and added a column to be able to display the months in the order November to May on the graphs, which does not follow either an alphabetical logic or a logic of month numbers.</p>
+
+							
+<pre><code class="python"># Import des données depuis BigQuery
+
+from google.colab import auth
+from google.cloud import bigquery
+from google.colab import data_table
+
+import pandas as pd
+
+project = 'premium-highway-386107'
+location = 'EU'
+client = bigquery.Client(project = project, location = location)
+data_table.enable_dataframe_formatter()
+auth.authenticate_user()
+avalanches = client.get_job(client.query('SELECT * FROM `premium-highway-386107.Data_avalanches.avalanches_clean2`')).to_dataframe()
+	
+#Modification de la typographie des deux massifs pour permette le tri par ordre alphabétique
+avalanches['Massif'] = avalanches['Massif'].str.replace('Écrins', 'Ecrins').str.replace('Mont-Blanc', 'Mont Blanc')
+	
+#Création des colonnes Mois et Année
+avalanches['Date'] = pd.to_datetime(avalanches['Date'])
+avalanches['Mois'] = avalanches['Date'].dt.month
+avalanches['Année'] = avalanches['Date'].dt.year	
+	
+#Création d'une colonne Mois_sort pour permettre par la suite le tri des mois dans l'ordre Nov, Déc, Jan etc
+def order(mois):
+  mois_sort = {
+	  1: "1- Jan",
+	  2: "2- Fév",
+	  3: "3- Mar",
+	  4: "4- Avr",
+	  5: "5- Mai",
+	  11: " 11- Nov",
+	  12: " 12- Déc"
+  }
+  return mois_sort.get(mois, "Autre")
+	
+avalanches['Mois_sort'] = avalanches['Mois'].apply(lambda x: order(x))
+	
+#Retrait des massifs sous-représentés, des avalanches avant 2010 et des avalanches comprises entre juin et octobre
+df_avalanches = avalanches.loc[
+	(~avalanches['Massif'].isin(['Autres', 'Alpes Grées N', 'Préalpes de Digne', 'Préalpes de Provence', 'Alpes Grées S', ''])) &
+	(pd.to_datetime(avalanches['Date']) >= '2010-01-01') &
+	(~avalanches['Date'].astype(str).str.split('-').str[1].isin(['06', '07', '08', '09', '10']))
+]
+	
+#Suppression des colonnes inutiles pour l'analyse
+df_avalanches = df_avalanches.drop(columns=['Secteur', 'Description', 'Date'])
+	
+# Reset des index après avoir supprimé des lignes en utilisant Id_avalanche comme index
+df_avalanches = df_avalanches.set_index(['Id_avalanche'])
+print(df_avalanches)
+</code></pre>
+</br>
+							<p>The second part of the analysis involved retrieving the list of summits and the list of outings from the <a href="https://skitour.fr/" target="_blank">Skitour.fr</a> website. The goal was, on the one hand, to be able to know the data specific to each massif like the number of summits or the average altitude and on the other hand, to know the frequentation of the different massifs. Skitour has an API that allowed me to retrieve the list of summits :</p>
+
+<pre><code class="python"># Récupération de la liste des sommets
+import json
+import requests
+	
+# Fonction pour récupérer les sommets via de l'API
+def fetch_data_from_api():
+	url = "https://skitour.fr/api/sommets"
+	headers = {"cle": "3OAUoyDOMLmsm16RJ3dphoQF4okNVmd"}
+
+	# Requête API
+	response = requests.get(url, headers=headers)
+
+	# Vérification si la requête a réussi
+	if response.status_code == 200:
+		return response.json()  # Convertir la réponse en format JSON
+	else:
+		# Afficher un message d'erreur si la requête a échoué
+		print("Erreur lors de la récupération des données de l'API.")
+		return None
+	
+	
+# Récupérer les données de l'API
+content = fetch_data_from_api()
+	
+if content:
+	# Initialiser des listes pour stocker les données
+	id_sommet_list = []
+	sommet_list = []
+	massif_list = []
+	altitude_list = []
+	
+	# Itérer sur chaque élément de la liste JSON
+	for item in content:
+		id_sommet_list.append(item['id'])
+		sommet_list.append(item['sommet'])
+		massif_list.append(item['massif']['nom'])
+		altitude_list.append(item['altitude'])
+	
+	# Créer le DataFrame
+	df_sommets = pd.DataFrame({
+		'id_sommet': id_sommet_list,
+		'sommet': sommet_list,
+		'massif': massif_list,
+		'altitude': altitude_list
+	})
+	
+	
+# Filtrer le dataframe pour ne conserver que les massifs des Alpes Françaises
+massifs_a_conserver = ['Vanoise', 'Ecrins', 'Cerces - Thabor - Mont Cenis', 'Bornes - Aravis', 'Belledonne',
+					   'Mont Blanc', 'Queyras - Alpes Cozie N', 'Ubaye - Parpaillon - Alpes Cozie S', 'Beaufortain',
+					   'Grandes Rousses - Arves', 'Lauzière - Cheval Noir', 'Haut Giffre - Aiguilles Rouges',
+					   'Taillefer - Matheysine', 'Bauges', 'Chartreuse', 'Chablais - Faucigny',
+					   'Mercantour - Alpes Maritimes Italiennes', 'Vercors', 'Devoluy']
+	
+df_sommets_filtres = df_sommets[df_sommets['massif'].isin(massifs_a_conserver)]
+	
+	
+# Regroupement des sommets par massif en conservant les données d'altitude
+df_sommets_filtres = df_sommets_filtres.copy()
+df_sommets_filtres['altitude'] = pd.to_numeric(df_sommets_filtres['altitude'])
+
+# Calcul des statistiques d'altitude par massif et selection des colonnes requises
+resume_altitude = df_sommets_filtres.groupby('massif')['altitude'].describe().round(decimals=0)
+resume_altitude = resume_altitude[['count', 'min', 'mean', 'max']]
+resume_altitude = resume_altitude.rename(columns={'count': 'Nbr_sommets', 'min': 'altitude_min', 'mean': 'altitude_moy', 'max': 'altitude_max'})
+
+# Comptage du nombre d'avalanches par massif dans le dataframe avalanches
+avalanches_massif = avalanches.groupby('Massif').agg({'Id_avalanche': 'count'}).sort_values('Id_avalanche', ascending=False)
+avalanches_massif.reset_index(inplace=True)
+avalanches_massif.set_index('Massif', inplace=True)
+	
+#Ajout du nombre d'avalanches aux données des massifs
+resume_altitude_freq =resume_altitude.merge(avalanches_massif['Id_avalanche'], left_on='massif', right_index=True, how='left')
+print(resume_altitude_freq)
+</code></pre>
+</br>
+
+							<p>For the outings, the Skitour API limits the number of data retrieved to the 1000 most recent. With a filter on the year in the API, it would have been possible to retrieve the last 1000 outings of each year which remained insufficient as I would never have had the data from the first months of winter. In order to be able to retrieve all the outings since 2010, I therefore used the scraping technique to obtain about 70,000 outings. From this data, I was able to create the table of the top 15 most frequented outings and the summary table which lists the number of outings and the number of avalanches per massif:</p>
+
+<pre><code class="python">import re
+from bs4 import BeautifulSoup
+from concurrent.futures import ThreadPoolExecutor
+	
+# Fonction pour récupérer les informations d'une sortie
+def get_sortie_info(url, sortie_id):
+	# Faire une requête GET à l'URL de la sortie
+	response = requests.get(url)
+	
+	# Vérifier si la requête a réussi
+	if response.status_code == 200:
+		# Analyser le contenu HTML avec BeautifulSoup
+		soup = BeautifulSoup(response.content, 'html.parser')
+	
+		# Extraire la balise title
+		title_tag = soup.title
+	
+		# Si la balise title existe, extraire le titre et la date
+		if title_tag:
+			# Utiliser une expression régulière pour extraire le titre et la date
+			pattern = r"^(.+), le (\d{2}\.\d{2}\.\d{2})"
+			match = re.match(pattern, title_tag.text.strip())
+	
+			if match:
+				date = match.group(2)
+	
+				# Extraire les sommets associés
+				sommets_associes = soup.find('strong', string=re.compile(r'Sommet[s]* associé[s]* :', re.IGNORECASE))
+				if sommets_associes:
+					sommets = sommets_associes.find_next_siblings('a')
+					if sommets:
+						premier_sommet = sommets[0]
+						id_sommet = int(re.search(r'/(\d+)', premier_sommet['href']).group(1))
+					else:
+						id_sommet = None
+	
+				else:
+					id_sommet = None
+
+				return {'date': date, 'id_sommet': id_sommet}
+			else:
+				return None
+		else:
+			return None
+	else:
+		print(f"Erreur lors de la récupération des données de la sortie {sortie_id}")
+		return None
+	
+# Fonction pour récupérer les informations de plusieurs sorties en parallèle
+def get_multiple_sorties_info(start_id, end_id):
+	# Liste pour stocker les informations de toutes les sorties
+	sorties_info = []
+	
+	# Boucle à travers les sorties dans la plage spécifiée
+	for sortie_id in range(start_id, end_id):
+		sortie_url = f"https://skitour.fr/sorties/{sortie_id}"
+		sortie_info = get_sortie_info(sortie_url, sortie_id)
+		if sortie_info:
+			sorties_info.append(sortie_info)
+			if sortie_id % 1000 == 0:
+				print(f"Numéro de sortie_id : {sortie_id}")
+	
+	return sorties_info
+	
+# Créer un ThreadPoolExecutor avec le nombre de threads spécifié
+with ThreadPoolExecutor(max_workers=10) as executor:
+	# Diviser la plage de sorties en sections pour chaque thread
+	start_ids = list(range(22920, 169581, 1000))
+	end_ids = [start_id + 1000 for start_id in start_ids]
+	
+	# Exécuter les requêtes en parallèle et récupérer les résultats
+	futures = [executor.submit(get_multiple_sorties_info, start_id, end_id) for start_id, end_id in zip(start_ids, end_ids)]
+	results = [future.result() for future in futures]
+	
+# Concaténer les résultats en une seule liste
+all_sorties_info = [info for sublist in results for info in sublist]
+	
+# Créer un DataFrame à partir des informations de sorties
+df_sorties = pd.DataFrame(all_sorties_info)
+
+#Suppression des lignes comportant une valeur nulle ou date inférieure au 01/01/2010
+df_sorties_clean = df_sorties.dropna(subset=['date', 'id_sommet'])
+df_sorties_clean = df_sorties_clean.copy()
+df_sorties_clean['id_sommet'] = df_sorties_clean['id_sommet'].astype(str).str.rstrip('.0')
+
+# Enrichissement de df_sorties avec les informations de df_sommets
+df_sorties_enrichi = df_sorties_clean.merge(df_sommets_filtres[['id_sommet', 'sommet', 'massif']], on='id_sommet', how='left')
+
+#Comptage du nombre de sorties par sommet
+df_sommets_comptage = df_sorties_enrichi.groupby(['id_sommet', 'sommet', 'massif']).agg(nombre_sorties=('date', 'count'))
+df_sommets_comptage = df_sommets_comptage.sort_values(by='nombre_sorties', ascending=False)
+
+#Comptage du nombre de sorties par massif
+df_massifs_comptage = df_sommets_comptage.groupby(['massif']).agg(nombre_sorties=('nombre_sorties', 'sum'))
+df_massifs_comptage = df_massifs_comptage.sort_values(by='nombre_sorties', ascending=False)
+
+#Ajout du nombre d'avalanches
+df_massifs_freq = df_massifs_comptage.merge(avalanches_massif['Id_avalanche'], left_on='massif', right_index=True, how='left')
+df_massifs_freq.rename(columns={'nombre_sorties':'Nbr_sorties', 'Id_avalanche': 'Nbr_avalanches'}, inplace=True)
+
+print(df_sommets_comptage.head(15))
+print(df_massifs_freq)
+</code></pre>
+</br>
+
+							<p>Now that we have all the data well formatted from the different data sources, we can move on to the statistical analysis itself. The first step was to check if there was a correlation between the number of outings and the number of avalanches in a massif. To create the scatter plot with the correlation line and the correlation coefficient, I used the following code:</p>
+
+<pre><code class="python">import plotly.express as px
+import numpy as np
+from scipy.stats import linregress
+	
+# Création du nuage de points avec Plotly
+fig = px.scatter(df_massifs_freq, x='Nbr_sorties', y='Nbr_avalanches', title='Is there a correlation between massif frequentation and the number of observed avalanches ?', labels={'Nbr_sorties': 'Number of outings', 'Nbr_avalanches': 'Number of observed avalanches'})
+	
+# Régression linéaire
+slope, intercept, r_value, p_value, std_err = linregress(df_massifs_freq['Nbr_sorties'], df_massifs_freq['Nbr_avalanches'])
+x_values = np.array([df_massifs_freq['Nbr_sorties'].min(), df_massifs_freq['Nbr_sorties'].max()])
+y_values = slope * x_values + intercept
+	
+# Ajout de la droite de régression
+fig.add_scatter(x=x_values, y=y_values, mode='lines', name='Régression linéaire')
+	
+# Équation de la droite de régression et R²
+equation = f'Y = {slope:.2f}X + {intercept:.2f}'
+r_squared = f'R² = {r_value**2:.2f}'
+	
+# Affichage de l'équation et de R² sous la légende
+fig.update_layout(
+	legend=dict(
+		yanchor="top",
+		y=0.99,
+		xanchor="left",
+		x=0.01
+	),
+	annotations=[
+		dict(
+			x=0.01,
+			y=0.92,
+			xref="paper",
+			yref="paper",
+			text=f'{equation}<br>{r_squared}',
+			showarrow=False
+		)
+	],
+	xaxis=dict(
+		tickformat='d'  # Utilisation du format "1000 2000 3000"
+	)
+)
+	
+# Affichage de la figure
+fig.show()
+</code></pre>
+							<span class="image fit"><img src="images\Correlation sorties vs avalanches.png" alt="" /></span>
+
+							<p>The next part involved studying the influence of the month on the frequency of avalanches, after creating three groups of massifs:</p>
+
+<pre><code class="python">#Création des groupes
+#Grp1 = Alpes de Nord & Alt moy < 2000m
+#Grp2 = Alpes de Nord & Alt moy > 2000m
+#Grp3 = Alpes de Sud & Alt moy > 2000m
+data= {
+	'Massif': ['Chartreuse', 'Vercors', 'Bauges', 'Chablais - Faucigny', 'Bornes - Aravis', 'Beaufortain', 'Taillefer - Matheysine', 'Lauzière - Cheval Noir', 'Belledonne', 'Haut Giffre - Aiguilles Rouges', 'Grandes Rousses - Arves', 'Vanoise', 'Mont Blanc', 'Haute Maurienne', 'Haute Tarentaise', 'Maurienne', 'Devoluy', 'Mercantour - Alpes Maritimes Italiennes', 'Ubaye - Parpaillon - Alpes Cozie S', 'Queyras - Alpes Cozie N', 'Cerces - Thabor - Mont Cenis', 'Ecrins'],
+	'Groupe': ['Grp 1', 'Grp 1', 'Grp 1', 'Grp 1', 'Grp 2', 'Grp 2', 'Grp 2', 'Grp 2', 'Grp 2', 'Grp 2', 'Grp 2', 'Grp 2', 'Grp 2', 'Grp 2', 'Grp 2', 'Grp 2', 'Grp 3', 'Grp 3', 'Grp 3', 'Grp 3', 'Grp 3', 'Grp 3']
+}
+df_groupes = pd.DataFrame(data)
+	
+#Ajout du groupe à la table avalanches
+df_avalanches_full = df_avalanches.merge(df_groupes, left_on='Massif', right_on='Massif')
+
+# Calcul du tableau croisé de la répartition des avalanches par mois selon le groupe
+tableau_mois = pd.crosstab(df_avalanches_full['Groupe'], df_avalanches_full['Mois_sort'], normalize='index')
+tableau_mois = tableau_mois.sort_index(ascending=True)
+
+# Création de la heatmap avec plotly express
+fig = px.imshow(tableau_mois.values,
+                x=tableau_mois.columns,
+                y=tableau_mois.index,
+                color_continuous_scale='Greens',
+                text_auto="0.0%",
+                title="What are the months with the most avalanches depending on the groups?")
+
+# Affichage du tableau interactif
+fig.show()
+</code></pre>
+							<span class="image fit"><img src="images\Répartition des avalanches par mois par groupe.png" alt="" /></span>
+
+<pre><code class="python">#Test du Chi-2 pour étudier si les groupes 2 et 3 présentent des différences significatives
+
+from scipy.stats import chi2_contingency
+	
+df_avalanches_grp = df_avalanches_full[df_avalanches_full['Groupe'] != 'Grp 1']
+	
+# Créer la table de contingence
+tableau_contingence_grp = pd.crosstab(df_avalanches_grp['Groupe'], df_avalanches_full['Mois_sort'])
+	
+# Effectuer le test du chi-2
+chi2, p_value, dof, expected = chi2_contingency(tableau_contingence_grp)
+	
+# Afficher les résultats
+print("Test du Chi-2 :")
+print(f"Chi-2 : {chi2}")
+print(f"P-value : {p_value}")
+print(f"Degrees of Freedom : {dof}")
+print("Expected frequencies :")
+print(expected)
+
+
+#Création de la heatmap des résidus standardisés 
+import matplotlib.pyplot as plt
+
+# Création du DataFrame à partir du tableau de contingence
+df = pd.DataFrame(tableau_contingence_grp)
+df = df.transpose()
+
+# Calcul des totaux marginaux par mois et par groupe
+df['Total_Groupe'] = df.sum(axis=1)
+df.loc['Total_Mois'] = df.sum()
+
+# Calcul des fréquences attendues
+expected_freq = np.outer(df.loc[:'5- Mai', 'Total_Groupe'].values, df.loc['Total_Mois', :'Grp 3'].values) / df.loc['Total_Mois', 'Total_Groupe']
+expected_df = pd.DataFrame(expected_freq, index=df.index[:-1], columns=df.columns[:-1])
+
+# Calcul des résidus standardisés
+residuals = (df.iloc[:-1, :-1] - expected_df) / np.sqrt(expected_df)
+residuals = residuals.round(2)  # Arrondi pour la lisibilité
+
+# Visualisation des résidus standardisés
+plt.figure(figsize=(10, 6))
+plt.title('Standardized residuals by group and by month')
+plt.imshow(residuals.T, cmap='coolwarm', interpolation='nearest')
+
+# Ajout des valeurs des résidus dans chaque case de la heatmap
+for i in range(len(df.columns[:-1])):
+    for j in range(len(df.index[:-1])):
+        plt.text(j, i, residuals.iloc[j, i], ha='center', va='center', color='white')
+
+plt.colorbar(label='Résidus standardisés')
+plt.xticks(range(len(df.index[:-1])), df.index[:-1])
+plt.yticks(range(len(df.columns[:-1])), df.columns[:-1])
+plt.show()</code></pre>
+							<span class="image fit"><img src="images\Répartition des avalanches par mois par groupe (résidus standardisés).png" alt="" /></span>
+					
+							<p>The last part of the project involved studying the influence of orientation on avalanche risks depending on the month. The analysis was carried out in the same way : a first part of the code to create the representation of the distribution of avalanches based on orientation and month, and then a second part for the calculation and representation of standardized residuals.</p>
+
+<pre><code class="python"># Représentation de la distribution
+
+#Retrait des lignes où l'orientation est égale à T (toutes)
+df_avalanches_full2 = df_avalanches_full[df_avalanches_full['Orientation'] != 'T']
+
+# Calcul du tableau croisé de la répartition des avalanches par orientation selon le mois
+tableau_face = pd.crosstab(df_avalanches_full2['Mois_sort'], df_avalanches_full2['Orientation'], normalize='index')
+tableau_face = tableau_face.sort_index(ascending=True)
+
+# Réorganiser les orientations pour affiche "dans l'ordre" sur le graphique
+order = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']
+tableau_face_reordered = tableau_face[order]
+
+# Création de la heatmap avec plotly express
+fig = px.imshow(tableau_face_reordered.values,
+                x=tableau_face_reordered.columns,
+                y=tableau_face_reordered.index,
+                color_continuous_scale='Greens',
+                text_auto="0.0%",
+                title="What are the orientations with the most avalanches depending on the month?")
+
+# Affichage du tableau interactif
+fig.show()
+
+
+#Calcul et Représentation des résidus standardisés
+
+df = pd.crosstab(df_avalanches_full2['Mois_sort'], df_avalanches_full2['Orientation'])
+
+# Calcul des totaux marginaux par mois et par orientation
+df['Total_Orientation'] = df.sum(axis=1)
+df.loc['Total_Mois'] = df.sum()
+
+# Définir l'ordre des orientations
+order = ['NW', 'N', 'NE', 'E', 'SE', 'S', 'SW', 'W']
+
+# Réorganiser les colonnes du dataframe selon l'ordre spécifié
+df = df[order + ['Total_Orientation']]
+
+# Calcul des fréquences attendues
+expected_freq = np.outer(df.loc[:'5- Mai', 'Total_Orientation'].values, df.loc['Total_Mois', order].values) / df.loc['Total_Mois', 'Total_Orientation']
+expected_df = pd.DataFrame(expected_freq, index=df.index[:-1], columns=order)
+
+# Calcul des résidus standardisés
+residuals = (df[order].iloc[:-1, :] - expected_df) / np.sqrt(expected_df)
+residuals = residuals.round(2)  # Arrondi pour la lisibilité
+
+# Visualisation des résidus standardisés avec les mois en lignes et les orientations en colonnes
+plt.figure(figsize=(10, 6))
+plt.title('Standardized residuals by month and by orientation')
+plt.imshow(residuals, cmap='coolwarm', interpolation='nearest')
+
+# Ajout des valeurs des résidus dans chaque case de la heatmap
+for i in range(len(order)):
+    for j in range(len(df.index[:-1])):
+        plt.text(i, j, residuals.iloc[j, i], ha='center', va='center', color='white')
+
+plt.colorbar(label='Standardized residuals')
+plt.yticks(range(len(df.index[:-1])), df.index[:-1])
+plt.xticks(range(len(order)), order)
+plt.show()</code></pre>
+
+						</section>
+					</div>
+
+					
+					<header id="header">
+						<a href="Projet_avalanches.html" class="logo">Back to the project</a>
+					</header>
+
+				<!-- Copyright -->
+					<div id="copyright">
+						<ul><li>&copy; Thibault Baroche</li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li></ul>
+					</div>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+			<script src="assets/js/highlight.min.js"></script>
+			<script>hljs.initHighlightingOnLoad();</script>			
+
+	</body>
+</html>

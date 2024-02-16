@@ -70,11 +70,489 @@
 
 								<h3>Statistical Analysis</h3>
 
-								<p>À venir</p>
-								<hr />
+								<p>All this analysis was carried out in Python, and the link to the technical part with the whole code used is available <a href="Projet_avalanches_technique.html">here</a>.</p>
+
+								<h4>Influence of massif visitation on avalanche occurrences</h4>
+
+								<p>The data-avalanche website lists observed avalanches. This means that it includes avalanches that occurred spontaneously and were later observed by a group of skiers, or avalanches that were triggered by skiers themselves. In this case, it is conceivable that there is a bias in the representativeness of avalanches listed on data-avalanche and probably a correlation with the visitation of the massifs. This is what we will try to demonstrate in this first part.</p>
+								
+								<p><b>Is there a correlation between the visitation of the massifs and the number of avalanches listed on data-avalanche?</b></p>
+								
+								<p>To answer this question, we will rely on data from the <a href="https://skitour.fr" target="_blank">skitour.fr</a> website. In the world of ski touring, this collaborative site serves as a bible and is a huge source of information. Skiers share their outings there, including the conditions of the day. Skitour also provides an exhaustive list of summits by massifs. Thanks to the Skitour API, I was able to retrieve the list of summits which will serve us later. I also managed to retrieve more than 70,000 recorded outings in the French massifs since 2010 (API + scraping).</p>
+								
+								<p>Here is the top 15 of the most frequented summits, along with the number of recorded activities since 2010:</p>
+								
+								<!-- Table -->
+								<div class="table-wrapper">
+									<table>
+										<thead>
+											<tr>
+												<th>Summit</th>
+												<th>Massif</th>
+												<th>Number of outings listed on skitour</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td>Croix de Chamrousse</td>
+												<td>Belledonne</td>
+												<td>939</td>
+											</tr>
+											<tr>
+												<td>Grand Van</td>
+												<td>Belledonne</td>
+												<td>690</td>
+											</tr>
+											<tr>
+												<td>Charmant Som</td>
+												<td>Chartreuse</td>
+												<td>623</td>
+											</tr>
+											<tr>
+												<td>Le Christomet</td>
+												<td>Bornes - Aravis</td>
+												<td>558</td>
+											</tr>
+											<tr>
+												<td>Pic de la Belle Etoile</td>
+												<td>Belledonne</td>
+												<td>550</td>
+											</tr>
+											<tr>
+												<td>Col de l'Encrenaz</td>
+												<td>Haut Giffre - Aiguilles Rouges</td>
+												<td>533</td>
+											</tr>
+											<tr>
+												<td>Tête Pelouse</td>
+												<td>Bornes - Aravis</td>
+												<td>513</td>
+											</tr>
+											<tr>
+												<td>Petit Som</td>
+												<td>Chartreuse</td>
+												<td>445</td>
+											</tr>
+											<tr>
+												<td>Dent du Pra</td>
+												<td>Belledonne</td>
+												<td>411</td>
+											</tr>
+											<tr>
+												<td>La Tournette</td>
+												<td>Bornes - Aravis</td>
+												<td>394</td>
+											</tr>
+											<tr>
+												<td>Trou de la Mouche</td>
+												<td>Bornes - Aravis</td>
+												<td>390</td>
+											</tr>
+											<tr>
+												<td>La Scia</td>
+												<td>Chartreuse</td>
+												<td>355</td>
+											</tr>
+											<tr>
+												<td>L'Etale</td>
+												<td>Bornes - Aravis</td>
+												<td>343</td>
+											</tr>
+											<tr>
+												<td>Grand Colon</td>
+												<td>Belledonne</td>
+												<td>339</td>
+											</tr>
+											<tr>
+												<td>Rocher Blanc</td>
+												<td>Belledonne</td>
+												<td>320</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+
+								<p></br>We can group all these outings by massifs in order to search for any correlation between the number of outings in a massif and the number of avalanches recorded there. It should be noted here that data-avalanche considers the Maurienne (163), the Haute-Maurienne (411), and the Haute Tarentaise (214) as massifs, whereas they are actually valleys surrounded by different massifs. Therefore, there is not a perfect match between the massifs on skitour and those on data-avalanche. For this part, we will not use them.</p>
+								</br>
+
+								<!-- Table -->
+								<div class="table-wrapper">
+									<table>
+										<thead>
+											<tr>
+												<th>Massif</th>
+												<th>Number of outings (Skitour)</th>
+												<th>Number of avalanches (Data-avalanche)</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td>Belledonne</td>
+												<td>12199</td>
+												<td>190</td>
+											</tr>
+											<tr>
+												<td>Bornes - Aravis</td>
+												<td>8038</td>
+												<td>207</td>
+											</tr>
+											<tr>
+												<td>Ecrins</td>
+												<td>6901</td>
+												<td>268</td>
+											</tr>
+											<tr>
+												<td>Queyras - Alpes Cozie N</td>
+												<td>4395</td>
+												<td>160</td>
+											</tr>
+											<tr>
+												<td>Mercantour - Alpes Maritimes Italiennes</td>
+												<td>4144</td>
+												<td>32</td>
+											</tr>
+											<tr>
+												<td>Chartreuse</td>
+												<td>3806</td>
+												<td>38</td>
+											</tr>
+											<tr>
+												<td>Beaufortain</td>
+												<td>3753</td>
+												<td>120</td>
+											</tr>
+											<tr>
+												<td>Vanoise</td>
+												<td>3462</td>
+												<td>410</td>
+											</tr>
+											<tr>
+												<td>Grandes Rousses - Arves</td>
+												<td>2972</td>
+												<td>100</td>
+											</tr>
+											<tr>
+												<td>Lauzière - Cheval Noir</td>
+												<td>2910</td>
+												<td>91</td>
+											</tr>
+											<tr>
+												<td>Bauges</td>
+												<td>2840</td>
+												<td>38</td>
+											</tr>
+											<tr>
+												<td>Haut Giffre - Aiguilles Rouges</td>
+												<td>2787</td>
+												<td>52</td>
+											</tr>
+											<tr>
+												<td>Ubaye - Parpaillon - Alpes Cozie S</td>
+												<td>2487</td>
+												<td>139</td>
+											</tr>
+											<tr>
+												<td>Cerces - Thabor - Mont Cenis</td>
+												<td>1978</td>
+												<td>231</td>
+											</tr>
+											<tr>
+												<td>Mont Blanc</td>
+												<td>1937</td>
+												<td>175</td>
+											</tr>
+											<tr>
+												<td>Vercors</td>
+												<td>1540</td>
+												<td>32</td>
+											</tr>
+											<tr>
+												<td>Devoluy</td>
+												<td>1412</td>
+												<td>29</td>
+											</tr>
+											<tr>
+												<td>Chablais - Faucigny</td>
+												<td>1342</td>
+												<td>34</td>
+											</tr>
+											<tr>
+												<td>Taillefer - Matheysine</td>
+												<td>981</td>
+												<td>40</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+
+							</br>
+
+							<p>We can represent this distribution as a scatter plot, where each point represents a massif:
+							<span class="image fit"><img src="images\Correlation sorties vs avalanches.png" alt="" /></span></p>
+							
+							<p>The linear correlation line has an R² value of 0.16. <b>Therefore, we can conclude that there is no significant correlation between the number of recorded outings in a massif and the number of observed avalanches</b>. By carefully studying the Top 15 of the most frequented summits, we realize that the majority of routes have a relatively low avalanche risk (routes partly on a ski resort, mountains with gentle slopes, etc.). This indicates that a majority of skiers take less risky routes and therefore are less exposed to avalanche risk.</p>
+							</br></br>
+
+							<h4>Influence of the month</h4>
+
+							<p>For the continuation of the analysis, we will group all the massifs into three categories. Using the list of summits from skitour, we can propose the following typology:</p>
+							<ol>
+								<li>Northern Alps massif with an average summit altitude below 2000m</li>
+								<li>Northern Alps massif with an average summit altitude above 2000m</li>
+								<li>Southern Alps massif with an average summit altitude above 2000m</li>
+							</ol>
+							<p>This will also allow us to reintegrate into the analysis the avalanches recorded on data-avalanche in Maurienne, Haute-Maurienne, and Haute-Tarentaise.</p>
+
+							<!-- Table -->
+							<div class="table-wrapper">
+								<table>
+									<thead>
+										<tr>
+											<th>Massif</th>
+											<th>Number of summits</th>
+											<th>Alt. Min (m)</th>
+											<th>Alt. Avg (m)</th>
+											<th>Alt. Max (m)</th>
+											<th>Number of avalanches</th>
+											<th>Group</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td>Chartreuse</td>
+											<td>65</td>
+											<td>1010</td>
+											<td>1682</td>
+											<td>2082</td>
+											<td>38</td>
+											<td>Grp 1</td>
+										</tr>
+										<tr>
+											<td>Vercors</td>
+											<td>78</td>
+											<td>365</td>
+											<td>1816</td>
+											<td>2341</td>
+											<td>32</td>
+											<td>Grp 1</td>
+										</tr>
+										<tr>
+											<td>Bauges</td>
+											<td>54</td>
+											<td>895</td>
+											<td>1845</td>
+											<td>2217</td>
+											<td>38</td>
+											<td>Grp 1</td>
+										</tr>
+										<tr>
+											<td>Chablais - Faucigny</td>
+											<td>87</td>
+											<td>1457</td>
+											<td>1996</td>
+											<td>2638</td>
+											<td>34</td>
+											<td>Grp 1</td>
+										</tr>
+										<tr>
+											<td>Bornes - Aravis</td>
+											<td>135</td>
+											<td>1230</td>
+											<td>2108</td>
+											<td>2750</td>
+											<td>207</td>
+											<td>Grp 2</td>
+										</tr>
+										<tr>
+											<td>Beaufortain</td>
+											<td>95</td>
+											<td>1330</td>
+											<td>2366</td>
+											<td>2995</td>
+											<td>120</td>
+											<td>Grp 2</td>
+										</tr>
+										<tr>
+											<td>Taillefer - Matheysine</td>
+											<td>43</td>
+											<td>1180</td>
+											<td>2382</td>
+											<td>2857</td>
+											<td>40</td>
+											<td>Grp 2</td>
+										</tr>
+										<tr>
+											<td>Lauzière - Cheval Noir</td>
+											<td>74</td>
+											<td>1840</td>
+											<td>2449</td>
+											<td>2832</td>
+											<td>91</td>
+											<td>Grp 2</td>
+										</tr>
+										<tr>
+											<td>Belledonne</td>
+											<td>203</td>
+											<td>1803</td>
+											<td>2502</td>
+											<td>2977</td>
+											<td>190</td>
+											<td>Grp 2</td>
+										</tr>
+										<tr>
+											<td>Haut Giffre - Aiguilles Rouges</td>
+											<td>101</td>
+											<td>1684</td>
+											<td>2600</td>
+											<td>3257</td>
+											<td>52</td>
+											<td>Grp 2</td>
+										</tr>
+										<tr>
+											<td>Grandes Rousses - Arves</td>
+											<td>94</td>
+											<td>1664</td>
+											<td>2772</td>
+											<td>3514</td>
+											<td>100</td>
+											<td>Grp 2</td>
+										</tr>
+										<tr>
+											<td>Vanoise</td>
+											<td>157</td>
+											<td>1600</td>
+											<td>2997</td>
+											<td>3855</td>
+											<td>410</td>
+											<td>Grp 2</td>
+										</tr>
+										<tr>
+											<td>Mont Blanc</td>
+											<td>132</td>
+											<td>1969</td>
+											<td>3310</td>
+											<td>4810</td>
+											<td>175</td>
+											<td>Grp 2</td>
+										</tr>
+										<tr>
+											<td>Haute Maurienne</td>
+											<td>-</td>
+											<td>-</td>
+											<td>-</td>
+											<td>-</td>
+											<td>411</td>
+											<td>Grp 2</td>
+										</tr>
+										<tr>
+											<td>Haute Tarentaise</td>
+											<td>-</td>
+											<td>-</td>
+											<td>-</td>
+											<td>-</td>
+											<td>214</td>
+											<td>Grp 2</td>
+										</tr>
+										<tr>
+											<td>Maurienne</td>
+											<td>-</td>
+											<td>-</td>
+											<td>-</td>
+											<td>-</td>
+											<td>163</td>
+											<td>Grp 2</td>
+										</tr>
+										<tr>
+											<td>Devoluy</td>
+											<td>89</td>
+											<td>1594</td>
+											<td>2262</td>
+											<td>2789</td>
+											<td>29</td>
+											<td>Grp 3</td>
+										</tr>
+										<tr>
+											<td>Mercantour - Alpes Maritimes Italiennes</td>
+											<td>347</td>
+											<td>1389</td>
+											<td>2584</td>
+											<td>3286</td>
+											<td>32</td>
+											<td>Grp 3</td>
+										</tr>
+										<tr>
+											<td>Ubaye - Parpaillon - Alpes Cozie S</td>
+											<td>227</td>
+											<td>1754</td>
+											<td>2748</td>
+											<td>3412</td>
+											<td>139</td>
+											<td>Grp 3</td>
+										</tr>
+										<tr>
+											<td>Queyras - Alpes Cozie N</td>
+											<td>286</td>
+											<td>2110</td>
+											<td>2799</td>
+											<td>3841</td>
+											<td>160</td>
+											<td>Grp 3</td>
+										</tr>
+										<tr>
+											<td>Cerces - Thabor - Mont Cenis</td>
+											<td>160</td>
+											<td>2064</td>
+											<td>2808</td>
+											<td>3506</td>
+											<td>231</td>
+											<td>Grp 3</td>
+										</tr>
+										<tr>
+											<td>Ecrins</td>
+											<td>468</td>
+											<td>1637</td>
+											<td>2922</td>
+											<td>4102</td>
+											<td>268</td>
+											<td>Grp 3</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							
+							<p>Based on this grouping classification, we can represent the distribution of avalanches according to the month:</p>
+							<span class="image fit"><img src="images\Répartition des avalanches par mois par groupe.png" alt="" /></span></p>
+							
+							<p>The distribution of avalanches by group and month reveals interesting insights. Firstly, in the massifs of group 1 (Northern Alps with an average summit altitude below 2000m), avalanches appear to be more concentrated from December to March. This observation makes sense as at these average altitudes, snow becomes scarce towards the end of the season</p>
+							
+							<p>However, for the massifs of groups 2 and 3 (Northern Alps with average summit altitude above 2000m and Southern Alps with average summit altitude above 2000m), the distribution seems fairly uniform throughout the season. To statistically analyze if there is a difference in distribution between these two groups, we can use a chi-square test. This test assumes that the distributions are the same and calculates the probability of making a mistake by rejecting this null hypothesis. The obtained p-value is 0.011, meaning we can reject the null hypothesis: there is indeed a significant difference in the distribution of avalanches by month between group 1 and group 2.</p>
+							
+							<p>Now, we need to highlight these differences between the two groups. For this, we can use the method of standardized residuals: for each group-month combination, we calculate the difference between the observed number of avalanches and the theoretical number if the variables were independent, then divide it by the expected standard deviation. Thus, positive values indicate an increased risk of avalanches, while negative values indicate a lower risk.</p>
+							<span class="image fit"><img src="images\Répartition des avalanches par mois par groupe (résidus standardisés).png" alt="" /></span></p>
+							<p>This standardized residuals analysis reveals interesting trends: in December, there were fewer avalanches than one might normally expect in the Northern Alps, while the Southern Alps experienced more avalanches than usual. The situation is different at the end of the season, where the Northern Alps experienced more avalanches than one might normally expect, while the Southern Alps were quieter than usual. This may indicate that in the Southern Alps, the end of the season is less risky than in the Northern Alps.</p>
+							<p>However, this analysis has some limitations. It is based on historical data, which do not guarantee the future behaviors of avalanches. The analysis assumes that the observations are independent, which may not be the case in reality (for example, in case of heavy snowfall, the occurrence of several avalanches in the same massif during the same month is not random). In addition, the analysis is carried out at a monthly and regional level, which may not capture variations on a finer scale. Finally, the analysis only takes into account the month and the region, while other factors can also influence the risk of avalanche. It is therefore important to consider these limitations when interpreting the results.</p>
+							</br></br>
+
+							<h4>Influence of the orientation</h4>
+
+							<p>In this final part, we will analyze whether the orientation of a slope has an influence on the occurrence of an avalanche. Knowing that the sun moves from East to West, the East-facing slopes get the sun in the morning, the South-facing slopes are the ones that warm up the most as they get the sun when it is at its highest, and the West-facing slopes get the late afternoon sun. Conversely, the North-facing slopes never see the sun. While the sun heats up quite a bit in the heart of winter, it can have a more significant influence as we get closer to spring. Therefore, a notion of temporality must be added to this analysis.</p>						
+							<span class="image fit"><img src="images\Répartition des avalanches par mois par orientation.png" alt="" /></span></p>
+							<p>This heatmap represents the distribution of avalanches recorded since 2010 according to orientation, all mountain ranges combined. Although it seems to provide some information, it cannot be directly used without additional processing: indeed, there are few avalanches recorded in November and May, which makes the high percentages observed (28 and 30%) not necessarily representative. Moreover, we do not know the distribution of all the mountains in the Alps but this is not necessarily distributed equally among all orientations. Therefore, as with the previous analysis, we will use the method of standardized residuals which compares deviations to expected theoretical values.</p>
+							<span class="image fit"><img src="images\Répartition des avalanches par mois par orientation (résidus standardisés).png" alt="" /></span></p>
+							<p>The study of standardized residuals (deviation from the distribution if the month and orientation had no influence on the avalanche risk) highlights two areas where avalanches are overrepresented. The first area corresponds to the North faces (orientations from NW to NE) for the months of March to May, which is the end of the season commonly referred to as spring skiing. The second area is also interesting as it seems to show a temporality: the East slopes seem to present an increased risk of avalanche and this area shifts towards the South or even South-East slopes as the season progresses. This seems to confirm the theory that as winter progresses, the impact of diurnal warming becomes increasingly important in the avalanche risk, and the faces that heat up the most would be more prone to avalanches.</p>	
+							</br></br>
+
+							<h4>Conclusion</h4>
+
+							<p>This study on avalanches, focused on the French Alps since 2010, has identified several risk factors. It was found that the visitation of the massifs has no significant correlation with the number of observed avalanches. The study also showed that there is a significant difference in the distribution of avalanches by month depending on the groups of massifs: the Southern Alps see fewer avalanches at the end of the season than the Northern Alps. Finally, the orientation of the slope has an influence with an increased risk on the North faces at the end of the season, and an influence of the sun and warming of the faces during winter.</p>
+							<p>However, it is important to highlight some limitations of this study. Avalanches are not independent of each other, which can affect the validity of statistical analyses. In addition, some essential correlation criteria such as the amount of precipitation, which is a major risk factor, were not studied. The angle of the slope, another potentially important factor, was also not taken into account as the data from data-avalanche were too incomplete on this parameter. Moreover, although the study was conducted at the scale of the Alps, an analysis at a finer scale, for example at the scale of a massif, could have revealed more nuanced trends, but specific to this massif.</p>
+							<p>Finally, and this is a crucial point to underline, a statistical study, however complete, will never replace the evaluation of a particular situation on the ground. When practicing ski touring and wishing to assess the avalanche risk during an outing, it is imperative to take into account the specific conditions of the moment and place.</p>
+							<p>In conclusion, this study provides valuable information to understand the factors influencing the occurrence of avalanches. However, it should not be used as the only tool for evaluating avalanche risk during mountain outings. Caution and careful observation of conditions on the ground remain the best tools at the disposal of skiers.</p>
+
+							<hr />
 
 								<h3>Technical part</h3>
-								<p><a href="#">À venir</p>
+								<p><a href="Projet_avalanches_technique.html">Click here</a> to explore the technical aspects of this study, from data cleaning with SQL and creation of the dashboard, to the Python script for the statistical analysis (including getting data from Skitour.fr)</p>
 
 							</section>
 					</div>
