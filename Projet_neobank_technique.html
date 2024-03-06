@@ -1,0 +1,425 @@
+<!DOCTYPE HTML>
+<!--
+	Massively by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+
+		<!-- Google tag (gtag.js) -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=G-M4ELZP38HE"></script>
+		<script>
+  			window.dataLayer = window.dataLayer || [];
+  			function gtag(){dataLayer.push(arguments);}
+  			gtag('js', new Date());
+  			gtag('config', 'G-M4ELZP38HE');
+		</script>
+
+		<title>Neobank Project - Technical part</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<link rel="stylesheet" href="assets/css/googlecode.min.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper" class="fade-in">
+
+				<!-- Header -->
+					<header id="header">
+						<a href="Projet_neobank.html" class="logo">Back to the project</a>
+					</header>
+
+				<!-- Nav -->
+				<nav id="nav">
+					<ul class="links">
+						<li><a href="index.html">About Me</a></li>
+						<li><a href="projects.html">My Projects</a></li>
+						<li><a href="contact.html">Contact</a></li>
+						<li><a href="CV_Thibault_BAROCHE.pdf" target="_blank">CV</a></li>
+					</ul>
+					<ul class="icons">
+						<li><a href="https://www.linkedin.com/in/thibault-baroche/" class="icon brands fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+						<li><a href="https://github.com/Thibault-Baroche" class="icon brands fa-github" target="_blank"><span class="label">GitHub</span></a></li>
+					</ul>
+				</nav>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- Post -->
+						<section class="post">
+							<header class="major">
+								<h3>NEOBANK CUSTOMER SEGMENTATION | Technical part</h3>
+							</header>			
+	
+							<p>For this project, the data was provided by <a href="https://www.lewagon.com/" target="_blank">Le Wagon</a>, where I have done my data analytics bootcamp. I have downloaded four tables with the following data, and loaded them into Bigquery. I had no additional contextual information, and all the information given in the project introduction on the previous page was extracted directly from the data.</p>
+							
+							<p><b>devices - A table of devices associated with a user</b></br>
+								- <b>brand</b>: string corresponding to the phone brand</br>
+								- <b>user_id</b>: string uniquely identifying the user</p>
+
+							<p><b>users - A table of user data</b></br>
+								- <b>user_id</b>: string uniquely identifying the user</br>
+								- <b>birth_year</b>: integer corresponding to the user’s birth year</br>
+								- <b>country</b>: two letter string corresponding to the user’s country of residence</br>
+								- <b>city</b>: two string corresponding to the user’s city of residence</br>
+								- <b>created_date</b>: datetime corresponding to the user’s created date</br>
+								- <b>user_settings_crypto_unlocked</b>: integer indicating if the user has unlocked the crypto currencies in the app</br>
+								- <b>plan</b>: string indicating on which plan the user is on</br>
+								- <b>attributes_notifications_marketing_push</b>: float indicating if the user has accepted to receive marketing push notifications</br>								
+								- <b>attributes_notifications_marketing_email</b>: float indicating if the user has accepted to receive marketing email notifications</br>	
+								- <b>num_contacts</b>: integer corresponding to the number of contacts the user has on neo bank</br>
+								- <b>num_referrals</b>: integer corresponding to the number of users referred by the selected user</br>
+								- <b>num_successful_referrals</b>: integer corresponding to the number of users successfully referred by the selected user (successfully means users who have actually installed the app and are able to use the product)</br></p>
+
+							<p><b>notifications - A table of notifications that a user has received</b></br>
+								- <b>reason</b>: string indicating the purpose of the notification</br>
+								- <b>channel</b>: string indicating how the user has been notified</br>
+								- <b>status</b>: string indicating the status of the notification</br>
+								- <b>user_id</b>: string uniquely identifying the user</br>
+								- <b>created_date</b>: datetime indicating when the notification has been sent</p>
+
+							<p><b>transactions - A table with transactions that a user made</b></br>
+								- <b>transaction_id</b>: string uniquely identifying the transaction</br>
+								- <b>transactions_type</b>: string indicating the type of the transaction</br>
+								- <b>transactions_currency</b>: string indicating the currency of the transaction</br>
+								- <b>amount_usd</b>: float corresponding to the transaction amount in USD</br>
+								- <b>transactions_state</b>: string indicating the state of a transaction (COMPLETED = the transaction was completed and the user's balance was changed; DECLINED/FAILED = the transaction was declined for some reason, usually pertains to insufficient balance; REVERTED - the associated transaction was completed first but was then rolled back later in time potentially due to customer reaching out to neo bank)</br>
+								- <b>ea_cardholderpresence</b>: string indicating if the card holder was present when the transaction happened</br>							
+								- <b>ea_merchant_mcc</b>: float corresponding to the Merchant Category Code (MCC)</br>
+								- <b>ea_merchant_city</b>: string corresponding to the merchant’s city</br>
+								- <b>ea_merchant_country</b>: string corresponding to the merchant’s country</br>
+								- <b>direction</b>: string indicating the direction of the transaction</br>
+								- <b>user_id</b>: string uniquely identifying the user</br>
+								- <b>created_date</b>: datetime corresponding to the transaction’s created date</p>
+							</br>
+
+								
+							<h3>Data Preparation for the segmentation (PYHTON)</h3>
+
+							<p>The first part of the project involved segmenting the customers by assigning a cluster number to each user in the users table. To achieve this, we needed to enrich the user table with some variables calculated from the transactions table and aggregated by user. The prerequisite was therefore to have a clean transactions table.</p>
+							
+							<p>The code below presents this first step of cleaning the transactions and calculating the different variables used later for segmentation. Some users showed very strange behaviors, with transaction amounts of several hundred thousand dollars or users with hundreds of transactions per month. In order not to distort the segmentation, I decided to exclude all users with at least one transaction over $50,000 and all transactions over $10,000. The idea behind this is that for these very marginal customers, a case-by-case study is more relevant than a "mass" approach based on algorithm-based segmentation.</p>
+							
+							<p>For each user, I calculated the following variables, with the intention of using them later for segmentation:</br>
+								- User engagement duration: This refers to the length of time a user has been interacting with our service.</br>
+								- Average number of transactions per month (with the detail of the transactions entering and exiting the user account): This metric captures both incoming and outgoing transactions.</br>
+								- Average monthly transaction amount (again with details of the directions): This metric provides the average amount of money involved in a user's transactions, categorized by incoming and outgoing activity.</br>
+								- The ratio between the incoming and outgoing amount: This helps us understand the balance between a user's spending and receiving behavior.</br>
+								- The part represented by the different types of transactions: This metric shows the proportion of each type of transaction a user makes.</br>
+								- The percentage of failed transactions: This helps identify potential issues with user accounts or transactions.</p>
+							<p>The code below presents this first step:</p>
+
+<pre><code class="python"># IMPORT AND CLEANING DATA
+import pandas as pd
+from google.colab import auth
+from google.cloud import bigquery
+from google.colab import data_table
+
+project = 'premium-highway-382507'
+location = 'EU'
+client = bigquery.Client(project = project, location = location)
+data_table.enable_dataframe_formatter()
+auth.authenticate_user()
+transactions = client.get_job(client.query('SELECT * FROM `premium-highway-386107.Neo_bank.transactions`')).to_dataframe()
+transactions = transactions.set_index('transaction_id')
+	
+# Remove rows where transactions_state is REVERTED or PENDING
+transactions = transactions[~transactions['transactions_state'].isin(['REVERTED', 'PENDING'])]
+	
+# Replace transactions_states DECLINED and CANCELLED by FAILED
+transactions['transactions_state'] = transactions['transactions_state'].replace({'DECLINED': 'FAILED', 'CANCELLED': 'FAILED'})
+	
+# Remove rows where transactions_type is FEE, TAX, CARD_REFUND, REFUND OR CAHSBACK
+transactions = transactions[~transactions['transactions_type'].isin(['FEE', 'TAX', 'CARD_REFUND', 'REFUND', 'CASHBACK'])]
+	
+# Remove rows where amount_usd is 0
+transactions = transactions[transactions['amount_usd'] != 0]
+
+# Remove columns transactions_currency, ea_cardholderpresence, ea_merchant_mcc, ea_merchant_city and ea_merchant_country
+transactions = transactions.drop(columns=['transactions_currency', 'ea_cardholderpresence', 'ea_merchant_mcc', 'ea_merchant_city', 'ea_merchant_country'])
+
+# Remove all users with at least one transaction above 50000$ or every transaction above 10000€
+users_with_large_transactions = transactions[transactions['amount_usd'] > 50000]['user_id'].unique()
+transactions = transactions[~transactions['user_id'].isin(users_with_large_transactions)]
+
+# Remove rows with NA values and saving the new dataframe
+transactions = transactions.dropna()
+transactions_clean = transactions
+
+#CALCULATION OF THE NEW VARIABLES
+# Grouping transactions by user_id
+transactions_clean['created_date'] = pd.to_datetime(transactions_clean['created_date'])
+transactions_clean.set_index('created_date', inplace=True)
+grouped = transactions_clean.groupby('user_id')
+
+# Calculate the variables
+transactions_by_user = pd.DataFrame({
+   'user_engagement_duration': grouped.apply(lambda x: (x.index.max() - x.index.min()).days / 30),
+   'average_transactions_per_month': grouped.size() / grouped.apply(lambda x: ((x.index.max() - x.index.min()).days / 30) if ((x.index.max() - x.index.min()).days / 30) != 0 else 1),
+   'average_inbound_transactions_per_month': grouped.apply(lambda x: (x['direction'] == 'INBOUND').sum()) / grouped.apply(lambda x: ((x.index.max() - x.index.min()).days / 30) if ((x.index.max() - x.index.min()).days / 30) != 0 else 1),
+   'average_outbound_transactions_per_month': grouped.apply(lambda x: (x['direction'] == 'OUTBOUND').sum()) / grouped.apply(lambda x: ((x.index.max() - x.index.min()).days / 30) if ((x.index.max() - x.index.min()).days / 30) != 0 else 1),
+   'average_amount_per_month': grouped['amount_usd'].sum() / grouped.apply(lambda x: ((x.index.max() - x.index.min()).days / 30) if ((x.index.max() - x.index.min()).days / 30) != 0 else 1),
+   'average_inbound_amount_per_month': grouped.apply(lambda x: x.loc[x['direction'] == 'INBOUND', 'amount_usd'].sum()) / grouped.apply(lambda x: ((x.index.max() - x.index.min()).days / 30) if ((x.index.max() - x.index.min()).days / 30) != 0 else 1),
+   'average_outbound_amount_per_month': grouped.apply(lambda x: x.loc[x['direction'] == 'OUTBOUND', 'amount_usd'].sum()) / grouped.apply(lambda x: ((x.index.max() - x.index.min()).days / 30) if ((x.index.max() - x.index.min()).days / 30) != 0 else 1),
+   'ratio_inbound_outbound_amount': grouped.apply(lambda x: x.loc[x['direction'] == 'INBOUND', 'amount_usd'].sum() / x.loc[x['direction'] == 'OUTBOUND', 'amount_usd'].sum() if x.loc[x['direction'] == 'OUTBOUND', 'amount_usd'].sum() != 0 else 1),
+   'ratio_topup': grouped.apply(lambda x: x.loc[x['transactions_type'] == 'TOPUP', 'amount_usd'].sum()) / grouped.apply(lambda x: x.loc[x['direction'] == 'INBOUND', 'amount_usd'].sum() if x.loc[x['direction'] == 'INBOUND', 'amount_usd'].sum() != 0 else 1),
+   'ratio_transfer_pos': grouped.apply(lambda x: x.loc[(x['transactions_type'] == 'TRANSFER') & (x['direction'] == 'INBOUND'), 'amount_usd'].sum()) / grouped.apply(lambda x: x.loc[x['direction'] == 'INBOUND', 'amount_usd'].sum() if x.loc[x['direction'] == 'INBOUND', 'amount_usd'].sum() != 0 else 1),
+   'ratio_transfer_neg': grouped.apply(lambda x: x.loc[(x['transactions_type'] == 'TRANSFER') & (x['direction'] == 'OUTBOUND'), 'amount_usd'].sum()) / grouped.apply(lambda x: x.loc[x['direction'] == 'OUTBOUND', 'amount_usd'].sum() if x.loc[x['direction'] == 'OUTBOUND', 'amount_usd'].sum() != 0 else 1),
+   'ratio_exchange': grouped.apply(lambda x: x.loc[x['transactions_type'] == 'EXCHANGE', 'amount_usd'].sum()) / grouped.apply(lambda x: x.loc[x['direction'] == 'OUTBOUND', 'amount_usd'].sum() if x.loc[x['direction'] == 'OUTBOUND', 'amount_usd'].sum() != 0 else 1),
+   'ratio_card_payment': grouped.apply(lambda x: x.loc[x['transactions_type'] == 'CARD_PAYMENT', 'amount_usd'].sum()) / grouped.apply(lambda x: x.loc[x['direction'] == 'OUTBOUND', 'amount_usd'].sum() if x.loc[x['direction'] == 'OUTBOUND', 'amount_usd'].sum() != 0 else 1),
+   'ratio_ATM': grouped.apply(lambda x: x.loc[x['transactions_type'] == 'ATM', 'amount_usd'].sum()) / grouped.apply(lambda x: x.loc[x['direction'] == 'OUTBOUND', 'amount_usd'].sum() if x.loc[x['direction'] == 'OUTBOUND', 'amount_usd'].sum() != 0 else 1),
+   'percentage_failed_transactions': grouped.apply(lambda x: (x['transactions_state'] == 'FAILED').mean())
+})
+	
+# Reset the index
+transactions_by_user.reset_index(inplace=True)</code></pre>				
+
+							<p>Once I had my table with all the variables calculated for each user, I studied the distribution of each one. The goal was to remove users with very unrepresentative behavior. This is because the segmentation algorithm used later is very sensitive to outliers. I decided to remove, for each of the calculated variables, users with a z-score greater than three (difference of more than 3σ from the mean). This represents, in a normal distribution, the 0.1% most extreme values:</p>
+							<span class="image fit"><img src="images\Distribution normale.png" alt="" /></span>
+								
+<pre><code class="python"># EXPLORING AND DELETING EXTREME VALUES
+
+# Creation of boxplots for each numerical variable before removing extreme values
+import matplotlib.pyplot as plt
+import pandas as pd
+from scipy import stats
+import numpy as np
+
+# Listing numerical variables
+numeric_variables = [var for var in transactions_by_user.columns if pd.api.types.is_numeric_dtype(transactions_by_user[var])]
+
+# Creation of a figure for boxplots
+fig, axs = plt.subplots(len(numeric_variables), figsize=(6, 2*len(numeric_variables)))
+
+# Creation of a boxplot for each numerical variable
+for i, var in enumerate(numeric_variables):
+   axs[i].boxplot(transactions_by_user[var], vert=False)
+   axs[i].set_title(var)
+   axs[i].set_xlabel('Valeurs')
+
+plt.tight_layout()
+plt.show()
+
+# Calculating z scores for each columns and removing users with at least one z score > 3
+z_scores = np.abs(stats.zscore(transactions_by_user[numeric_variables]))
+mask = (z_scores > 3).any(axis=1)
+
+# Storing data in a new transactions_by_user_condensed dataframe
+transactions_by_user_condensed = transactions_by_user[~mask]
+
+# Creation of a second figure for boxplots after removing extreme values
+fig2, axs2 = plt.subplots(len(numeric_variables), figsize=(6, 2*len(numeric_variables)))
+
+# Creation of a boxplot for each numerical variable in the condensed dataframe
+for i, var in enumerate(numeric_variables):
+   axs2[i].boxplot(transactions_by_user_condensed[var], vert=False)
+   axs2[i].set_title( var + ' without extremes')
+   axs2[i].set_xlabel('Valeurs')
+
+plt.tight_layout()
+plt.show()</code></pre>
+
+							<p>The figure below shows the distribution of users for each of the calculated variables, in the form of boxplots. The left column shows all users, and the right column shows users with a z-score less than 3, i.e. without the 0.1% most extreme values. We can see from the values on the axes that some users would have completely distorted the segmentation.</p>
+							<span class="image fit"><img src="images\Boxplots_neobank.png" alt="" /></span>
+
+							<p>Then I imported my users table from BigQuery. To this table, I added the different variables previously calculated from the transactions table:</p>
+
+<pre><code class="python"># IMPORT USERS DATA FROM BIGQUERY
+
+users = client.get_job(client.query('SELECT * FROM `premium-highway-386107.Neo_bank.users`')).to_dataframe()
+users = users.set_index('user_id')
+
+# Transform year of birth into age
+from datetime import datetime
+users['age'] = datetime.now().year - users['birth_year']
+
+# Remove useless columns
+users = users.drop(columns=['birth_year', 'city', 'created_date', 'user_settings_crypto_unlocked', 'attributes_notifications_marketing_push', 'attributes_notifications_marketing_email', 'num_referrals', 'num_successful_referrals'])
+
+# Merge on the transactions_by_user_condensed dataframe
+users_full = transactions_by_user_condensed.merge(users, how='left', on='user_id')
+users_full = users_full.dropna()
+users_full = users_full.set_index('user_id')
+users_full.describe()</code></pre>
+
+							</br>
+							<h3>Segmentation with K-means algorithm</h3>
+
+							<p>It was now time to perform the segmentation using the k-means algorithm. This algorithm is an unsupervised learning method used to group data points into distinct groups, called "clusters", based on their similarity. It calculates "centroids", which are central points representing each cluster, and iterates by assigning each data point to the nearest centroid, then recalculating the centroids based on the points assigned to it. This process repeats until the distance between the data points and their respective centroids ceases to change significantly. The accuracy of the segmentation is assessed using the silhouette score, which ranges between -1 and 1. A score close to 1 indicates good cohesion and separation of clusters, a score of 0 indicates overlapping clusters, and a score of -1 indicates poor cluster assignment. The goal here was therefore to find the most discriminating variables to perform the segmentation, by looking for the relevant variables and the right number of clusters.</p>
+
+
+<pre><code class="python"># SEGMENTATION OF THE CLIENTS WITH THE K-MEAN METHOD
+
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import LabelEncoder
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Creation of a dataframe with only the chosen variables
+variables = [
+#'user_engagement_duration',
+'average_transactions_per_month',
+#'average_inbound_transactions_per_month',
+#'average_outbound_transactions_per_month',
+'average_amount_per_month',
+#'average_inbound_amount_per_month',
+#'average_outbound_amount_per_month',
+#'ratio_inbound_outbound_amount',
+#'ratio_topup',
+#'ratio_transfer_pos',
+#'ratio_transfer_neg',
+#'ratio_exchange',
+#'ratio_card_payment',
+#'ratio_ATM',
+#'percentage_failed_transactions',
+#'country',
+#'plan',
+#'num_contacts',
+'age'
+]
+df = users_full[variables]
+
+# Preprocessing of the data
+# Encoding of categorical variables
+for col in df.select_dtypes(include=['object']).columns:
+   df[col] = LabelEncoder().fit_transform(df[col])
+
+# Normalization of numerical variables
+scaler = StandardScaler()
+df_scaled = scaler.fit_transform(df)
+
+# Creation of the K-means model
+n_clusters = 3
+kmeans = KMeans(n_clusters, n_init=15)
+
+# Training of the model
+kmeans.fit(df_scaled)
+
+# Getting the cluster labels
+labels = kmeans.labels_
+
+# Test of the silhouette score
+from sklearn.metrics import silhouette_score
+score = silhouette_score(df_scaled, labels)
+
+print('Silhouette score:', score)
+
+users_full['cluster'] = labels
+print(users_full['cluster'].value_counts())
+
+# EXPORTING CLUSTERS TO CSV
+
+df_export = users_full[['cluster']]
+df_export.to_csv('user_clusters.csv', index=True)</code></pre>
+
+							<p>By keeping only the variables average_transactions_per_month, average_amount_per_month and age and performing 3 clusters, we obtain a silhouette score of <b>0.48</b>, which is a very interesting result. The clusters are then added to our users table and exported to CSV, in order to return and enrich our data in Bigquery.</p>
+
+							</br>
+							<h3>DATA PREPARATION WITH BIGQUERY (SQL)</h3>
+
+							<p>It is now time to prepare our data in SQL before we can link it to Power BI. I have created only two enriched tables: users and transactions. For the users table, I have added the information from the notifications table (which I will not use in the report) and the information from the clusters table created previously. Since the outlier exploration was done during the segmentation, I have only kept the users_id for which a cluster has been assigned. This means that our dashboard will not take into account users with very specific behaviors, which is a choice. It is aimed at the product team and should help them develop new offers. It is therefore more important to represent the "mass" of customers rather than unrepresentative customers who would not justify launching a new product for them alone.</p>
+
+							<p>The two queries below show the data preparation, which was relatively quick given the initial rather qualitative data formatting.</p>
+
+<pre><code class="sql">WITH notif AS (
+  SELECT
+    user_id
+    ,COUNT(user_id) AS notifs
+  FROM `premium-highway-386107.Neo_bank.notifications`
+  GROUP BY user_id
+),
+
+cluster AS (
+  SELECT
+    user_id
+    ,CASE
+      WHEN cluster = 0 THEN 1
+      WHEN cluster = 1 THEN 2
+      WHEN cluster = 2 THEN 3
+    END AS cluster
+  FROM `premium-highway-386107.Neo_bank.clusters`
+)
+
+SELECT
+  CAST(REGEXP_EXTRACT(u.user_id, r'user_(\d+)') AS INT64) AS user_id
+  ,EXTRACT(YEAR FROM CURRENT_DATE()) - u.birth_year AS age
+  ,u.country
+  ,DATE(u.created_date) AS registration_date
+  ,FORMAT_TIMESTAMP('%m_%Y', u.created_date) AS cohort
+  ,CASE
+    WHEN u.plan = 'PREMIUM_OFFER' THEN 'PREMIUM'
+    WHEN u.plan = 'PREMIUM_FREE' THEN 'PREMIUM'
+    WHEN u.plan = 'METAL_FREE' THEN 'METAL'
+    ELSE u.plan
+  END as plan
+  ,u.num_contacts
+  ,n.notifs
+  ,d.string_field_0 AS device
+  ,c.cluster
+FROM `premium-highway-386107.Neo_bank.users` u
+LEFT JOIN notif AS n ON u.user_id = n.user_id
+LEFT JOIN `premium-highway-386107.Neo_bank.devices` AS d ON u.user_id = d.string_field_1
+LEFT JOIN cluster AS c ON u.user_id = c.user_id
+ORDER BY user_id ASC</code></pre>
+
+
+<pre><code class="sql">SELECT 
+  CAST(REGEXP_EXTRACT(transaction_id, r'transaction_(\d+)') AS INT64) AS transaction_id
+  ,DATE(created_date) AS created_date
+  ,CAST(REGEXP_EXTRACT(user_id, r'user_(\d+)') AS INT64) AS user_id
+  ,CASE
+    WHEN transactions_type = 'TRANSFER' AND direction = 'INBOUND' THEN 'TRANSFER_POS'
+    WHEN transactions_type = 'TRANSFER' AND direction = 'OUTBOUND' THEN 'TRANSFER_NEG'
+    ELSE transactions_type
+  END AS transaction_type
+  ,transactions_currency AS transaction_currency
+  ,amount_usd
+  ,transactions_state AS transaction_state
+  ,direction
+FROM `premium-highway-386107.Neo_bank.transactions`
+ORDER BY transaction_id ASC</code></pre>
+					
+							</br>
+							<h3>DATA VISUALIZATION IN POWER BI</h3>
+
+							<p>The final part of the project was to visually represent all the insights so that the product team could have a clear vision of the customer base and adapt its offers. I wanted to create a first page that focuses on user acquisition and retention as well as on the representation of certain demographic parameters such as age and location. The second page is more intended to highlight the differences between each segment, in order to have a clear vision of the different user behaviors. Here are all the tables and metrics used to create the dashboard.</p>
+							<span class="image fit"><img src="images\Neobank - Tables Power BI.png" alt="" /></span>
+
+							</br>		
+							<h3>CONCLUSION</h3>
+
+							<p>In conclusion, this project successfully utilized Python, SQL, and Power BI to segment the customer base. By carefully selecting relevant variables and employing the K-means algorithm, we achieved a silhouette score of 0.48, indicating a well-defined segmentation. This analysis, coupled with the creation of user-friendly dashboard, provides valuable insights into customer behavior and demographics. These insights can inform targeted marketing strategies and product development initiatives, ultimately contributing to NeoBank's continued success in the competitive financial landscape.</p>
+
+						</section>
+					</div>
+					
+					<header id="header">
+						<a href="Projet_neobank.html" class="logo">Back to the project</a>
+					</header>
+
+				<!-- Copyright -->
+					<div id="copyright">
+						<ul><li>&copy; Thibault Baroche</li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li></ul>
+					</div>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+			<script src="assets/js/highlight.min.js"></script>
+			<script>hljs.initHighlightingOnLoad();</script>			
+
+	</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE HTML>
+<!--
+	Massively by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+
+		<!-- Google tag (gtag.js) -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=G-M4ELZP38HE"></script>
+		<script>
+  			window.dataLayer = window.dataLayer || [];
+  			function gtag(){dataLayer.push(arguments);}
+  			gtag('js', new Date());
+  			gtag('config', 'G-M4ELZP38HE');
+		</script>
+
+
+		<title>Neobank customer segmentation</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+		<div id="wrapper" class="fade-in">
+
+				<!-- Header -->
+				<header id="header">
+				</header>
+
+				<!-- Nav -->
+					<nav id="nav">
+						<ul class="links">
+							<li><a href="index.html">About Me</a></li>
+							<li><a href="projects.html">My Projects</a></li>
+							<li><a href="contact.html">Contact</a></li>
+							<li><a href="CV_Thibault_BAROCHE.pdf" target="_blank">CV</a></li>
+						</ul>
+						<ul class="icons">
+							<li><a href="https://www.linkedin.com/in/thibault-baroche/" class="icon brands fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+							<li><a href="https://github.com/Thibault-Baroche" class="icon brands fa-github" target="_blank"><span class="label">GitHub</span></a></li>
+						</ul>
+					</nav>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- Post -->
+							<section class="post">
+								<header class="major">
+									<span class="date">March 6, 2024</span>
+									<h1>NEOBANK : CUSTOMER SEGMENTATION FOR THE PRODUCT TEAM</h1>
+								</header>
+								
+								<p>Imagine yourself as the product manager of an online bank launched in mid-2017. It's now mid-2019, and the user base has grown steadily. However, to truly thrive in a competitive market, you need to uncover deeper insights into your customers' behaviors and preferences. This understanding will be crucial for designing new offerings that boost engagement, reduce churn, and elevate the customer experience.</p>
+								<p>Solution: enter me, your data analyst. My mission? To help you unlock the hidden potential within your customer base. Through data analysis, I've constructed a comprehensive dashboard providing a picture of your clients. Additionally, I've leveraged powerful machine learning algorithms to segment your customers into three distinct categories, each with unique characteristics.</p>
+								<p>Intrigued? Dive deeper and explore the technical details of this project, which you'll find <a href="Projet_neobank_technique.html">here</a> and at the end of this page.</p>
+
+								<div class="responsive-iframe-container-paysage">
+									<iframe title="Neobank - v2" src="https://app.powerbi.com/view?r=eyJrIjoiMjk5N2E4MDYtMDk2Yy00ZThlLWJlN2QtZWJlZWQzZmQyMGRiIiwidCI6IjZmMzRkNDRlLWEyODEtNDIzMC04MDJhLWEzNzBkMWM5ZjQyYyJ9&pageName=ReportSection" frameborder="0" allowFullScreen="true"></iframe>
+								</div>
+								<hr />
+
+								<p>For this project, I used real, anonymized data from an online bank, encompassing a customer table with all new customers registered during 2018 and a transaction table with all transactions made by these registered customers from January 2018 to April 2019.</p>
+								
+								<p>The initial dashboard page offers the product team clear insights into customer acquisition, retention, and demographics. In 2018, the bank acquired 15,745 new contracts, with 15,111 users making at least one transaction, demonstrating a high initial engagement rate. Notably, one-third of the customer base resides in the UK, with a strong European presence. The majority fall within the working-age demographic, with comparatively few customers under 25 or over 55. Interestingly, the Standard contract accounts for over 93% of subscriptions, while Premium and Metal options represent only 4% and 3% respectively. Despite a promising initial engagement rate, a concerning trend emerges in long-term retention. Only 70% of customers remain active one month after their first transaction, and this figure drops to 60% after six months. This highlights a crucial challenge for the product team: increasing customer retention and engagement over the long term.</p>
+
+								<p>Therefore, the product team seeks solutions to three key questions:</br>
+								<b>- How to attract more customers?</br>
+								- How to encourage customers to upgrade to premium and metal contracts?</br>
+								- How to improve customer retention and engagement?</b></p>
+
+								<p>To address these questions, I conducted a deep dive into the data, exploring various customer segments and identifying potential patterns. This analysis aims to provide actionable insights and recommendations that empower the product team to optimize their strategies and achieve their business goals.</p>
+
+								<h4>Customer Segmentation and Insights</h4>
+
+								<p>To gain deeper insights into customer behavior and preferences, I employed a machine learning clustering algorithm. This technique groups customers with similar characteristics, allowing us to understand their unique needs and tailor our strategies accordingly.</p>
+								<p>The key challenge in segmentation lies in identifying the most discriminating variables, those that effectively distinguish between customer groups. By carefully evaluating various factors, I determined that the following criteria yielded the most robust and differentiated segments:</br>
+								- Age</br>
+								- Number of monthly transactions (received and sent)</br>
+								- Total amount of monthly transactions (received and sent)</p>
+
+								<p>Based on these criteria, the analysis identified three distinct customer segments:
+								<span class="image fit"><img src="images\Neobank - Segmentation.png" alt="" /></span></p>
+
+								<h4>Segment Analysis</h4>
+
+								<p><b>Active Users (Segment 1)</b>: This segment comprises users with an average age of 37. They exhibit the highest level of activity, averaging 20 transactions per month for a total value of $1444. Notably, 20% of these customers have opted for premium or metal contracts, indicating a higher propensity for premium features. Their primary transaction types include card payments for expenses (10 per month) and top-ups for incomes ($500 per month).</p>
+								<p><b>Moderate Users (Segment 2)</b>: This segment consists of users with an average age of 56. They display moderate activity, averaging 5 transactions per month with a higher average transaction amount ($82) compared to Segment 1. Interestingly, only 6% of this segment hold premium or metal contracts. Their primary transaction types include a single monthly top-up as income, a significant currency exchange and card payments (3 per month) as expenses.</p>
+								<p><b>Low-Engagement Users (Segment 3)</b>: This segment encompasses users with an average age of 35. They exhibit the lowest level of engagement, averaging 6 transactions per month with a total value of €297. Similar to Segment 2, only 3% hold premium or metal contracts. Their primary transaction types include a single monthly top-up and card payments.</p>
+
+								<h4>Recommendations to the product team</h4>
+
+								<p>Once the segments have been identified, let's see what actions we can put in place to increase customer activity and therefore improve customer retention.</p>
+								<p>First of all, the steady growth in the number of customers during the whole year indicates an effective acquisition strategy. However, the retention rate of 70% after one month and 60% after six months suggests potential friction points in the early customer journey. This could be due to a poorly designed app, unattractive services, or a lack of personalized communication. Based on the data analysis, we can propose the following improvements:</p>
+								<p><b>Active Users (Segment 1)</b>: Prioritize upselling to Premium and Metal contracts. These users, with an average age of 37, exhibit high activity (20 transactions per month for a total of $1444). They are more likely to be interested in exclusive benefits, like:</br>
+								- Wealth and investment management services: Cater to their higher income and top-up amounts by offering personalized financial advice and growth opportunities.</br>
+								- Personalized loyalty programs: Reward their engagement with exclusive benefits like cashback on selected categories, airport lounge access, or priority customer service.</br>
+								- Free trial periods: Offer a limited-time trial of premium services, like a high-limit metal card, to showcase their added value and encourage conversion.</p>
+
+								<p><b>Moderate users (Segment 2)</b>: Incentivize switching their main account. This segment, with an average age of 56, has moderate activity (5 transactions per month, $451 average transaction) and a higher average transaction amount than Segment 1. They might hold higher purchasing power but haven't chosen the bank as their primary financial institution. Consider offering:</br>
+								- Switching bonus: Provide a cash incentive or waived transfer fees for switching their main account to the bank.</br>
+								- Personalized support: Offer dedicated support channels and personalized advice to address their potential concerns about transitioning to a fully digital bank.</p>
+
+								<p><b>Low engagement users (Segment 3)</b>: Increase engagement through incentives. This segment, with an average age of 35, exhibits the lowest engagement (6 transactions per month, €297 total value). Understanding their needs is crucial. We can:</br>
+								- Transaction-based rewards: Implement a bonus system based on monthly transaction volume to incentivize active use.</br>
+								- Loyalty program: Develop a "loyalty points" program where points earned through transactions can be redeemed for discounts or rewards from partner companies, increasing engagement and brand loyalty.</p>
+
+								<h4>Conclusion</h4>
+								<p>By implementing these data-driven recommendations, we can address specific needs and pain points of each segment. We could boost our revenue and profitability by increasing conversion of active users to premium plans. We could also hope for higher engagement and potential account switching from moderate users, expanding the customer base and increasing deposits. Finally, a better understanding and engagement of low-engagement users should lead to fostering future growth and retention.</p>
+								<p>This personalized approach, based on data-driven insights, demonstrates the value of customer segmentation and its potential to significantly improve customer experience, drive engagement, and ultimately, increase the bank's revenue.</p>
+
+								<hr />
+
+								<h3>Technical part</h3>
+								<p><a href="Projet_neobank_technique.html">Click here</a> to discover the technical part of this project: data preparation in SQL, exploration and segmentation using a machine learning algorithm with Python.
+
+								</p>
+
+							</section>
+					</div>
+
+					<header id="header">
+						<a href="projects.html" class="logo">Back to the projects</a>
+					</header>
+
+				<!-- Copyright -->
+					<div id="copyright">
+						<ul><li>&copy; Thibault Baroche</li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li></ul>
+					</div>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
